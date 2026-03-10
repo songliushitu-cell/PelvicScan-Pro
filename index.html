@@ -211,7 +211,17 @@
                 <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-2 z-10">肌骨力学综合诊断结论</h2>
                 
                 <div id="final-result-title" class="text-xl sm:text-2xl font-black text-indigo-700 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight">获取中...</div>
-                <p id="final-result-desc" class="text-slate-600 text-left text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-50 shadow-sm z-10">--</p>
+
+                <!-- 新增：明确骨盆朝向面板 -->
+                <div class="w-full bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-2 mb-3 z-10 shadow-sm">
+                    <span class="text-lg">🧭</span>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-0.5">骨盆绝对朝向</span>
+                        <span id="final-pelvic-orientation" class="text-xs sm:text-sm font-black text-indigo-700 leading-snug">--</span>
+                    </div>
+                </div>
+
+                <p id="final-result-desc" class="text-slate-600 text-left text-[11px] sm:text-xs leading-relaxed mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-50 shadow-sm z-10">--</p>
 
                 <div class="w-full flex flex-col gap-4 z-10">
                     <!-- 阶段一：通用基础 -->
@@ -309,7 +319,7 @@
         const historyList = document.getElementById('history-list');
         const btnClearHistory = document.getElementById('btn-clear-history');
 
-        // Global State (Keep track of both Left and Right)
+        // Global State
         let testRecords = { 
             slr: { L: null, R: null }, 
             hip: { L: null, R: null }, 
@@ -329,7 +339,7 @@
         let liveStream = null;
         let liveRequestID = null;
 
-        // Auto-Peak Detection
+        // Auto-Peak Detection (1.5s)
         let liveMaxAngle = 0;
         let liveMaxFrameDataURL = null;
         let liveMaxPoints = [];
@@ -435,7 +445,7 @@
         radioInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
         sideInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
 
-        // --- 4. Live Tracking (Strict Isometric Hold Algorithm) ---
+        // --- 4. Live Tracking (Strict Isometric Hold Algorithm 1.5s) ---
         btnStartCamera.addEventListener('click', async () => {
             resetCanvasForNewUpload(); lastCaptureMethod = 'live';
             liveMaxAngle = 0; liveMaxFrameDataURL = null; liveMaxPoints = []; angleHistory = []; isHolding = false; holdStartTime = 0;
@@ -455,9 +465,9 @@
                 const tSideName = document.querySelector('input[name="testSide"]:checked').value === 'L' ? '左侧' : '右侧';
                 
                 let speech = "";
-                if (tType === 'slr') speech = `即将进行${tSideName}主动直腿抬高测试。请仰卧平躺，测试腿完全伸直抬高。如果出现膝盖弯曲、大腿外展或骨盆转动，请立即停在代偿瞬间并保持2秒。`;
-                else if (tType === 'hip') speech = `即将进行${tSideName}主动髋屈曲测试。将膝盖向胸口拉起。出现骨盆卷起或大腿向外打开时，请立即停止并保持2秒。`;
-                else speech = `即将进行${tSideName}主动肩屈测试。手臂向后上方抬起。如果发现手臂旋转或挺胸代偿，请立即停止并保持2秒。`;
+                if (tType === 'slr') speech = `即将进行${tSideName}主动直腿抬高测试。请仰卧平躺，测试腿完全伸直抬高。如果出现膝盖弯曲、大腿外展或骨盆转动，请立即停在代偿瞬间并保持1.5秒。`;
+                else if (tType === 'hip') speech = `即将进行${tSideName}主动髋屈曲测试。将膝盖向胸口拉起。出现骨盆卷起或大腿向外打开时，请立即停止并保持1.5秒。`;
+                else speech = `即将进行${tSideName}主动肩屈测试。手臂向后上方抬起。如果发现手臂旋转或挺胸代偿，请立即停止并保持1.5秒。`;
                 speak(speech);
                 
                 livePoseLoop();
@@ -496,7 +506,9 @@
             
             currentFinalAngle = liveMaxAngle; renderCanvasAndResult(sourceImage); 
             setTimeout(() => resultBoard.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
-            speak(`角度已锁定为${liveMaxAngle.toFixed(1)}度。`);
+            
+            // 语音修改为：拍摄完整，角度是多少度
+            speak(`拍摄完整，角度是${liveMaxAngle.toFixed(1)}度。`);
         }
 
         btnLockFrame.addEventListener('click', triggerAutoLock);
@@ -593,7 +605,7 @@
 
                     document.getElementById('live-angle-display').innerText = smoothedAngle.toFixed(1) + '°';
 
-                    // 终极防死锁与防作弊 2秒算法
+                    // 终极防死锁与防作弊 1.5秒算法 (改为了1500ms)
                     if (smoothedAngle > 25) {
                         if (smoothedAngle > liveMaxAngle) {
                             liveMaxAngle = smoothedAngle; saveFrameToBuffer(); holdStartTime = Date.now(); isHolding = true;
@@ -601,9 +613,9 @@
                         } else if (liveMaxAngle - smoothedAngle <= 5) {
                             if (!isHolding) { isHolding = true; holdStartTime = Date.now(); }
                             let holdTime = Date.now() - holdStartTime;
-                            if (holdTime >= 2000) { triggerAutoLock(); return; } 
+                            if (holdTime >= 1500) { triggerAutoLock(); return; } // 修改为1.5秒
                             else {
-                                let timeLeft = ((2000 - holdTime) / 1000).toFixed(1);
+                                let timeLeft = ((1500 - holdTime) / 1000).toFixed(1);
                                 document.getElementById('live-status-text').innerHTML = `<span class="text-rose-500 font-black tracking-widest text-sm shadow-sm px-2 py-1 bg-slate-900/50 rounded-full">🎯 保持住！ ${timeLeft}s 📸</span>`;
                             }
                         } else {
@@ -659,12 +671,9 @@
         }
         function getKeypoint(kp, name) { return kp.find(k => k.name === name) || {x:0, y:0, score:0}; }
 
-        // 修改单边文字反馈 (纯客观反映，不直接下定论，留给双侧比对)
+        // 修改单边文字反馈
         function renderThresholdFeedback(testType, testSide, angleDeg) {
-            let tName = testType === 'slr'?'主动直腿抬高':(testType==='hip'?'主动髋屈曲':'主动肩屈');
-            let sName = testSide === 'L'?'左侧':'右侧';
             let ability = testType === 'slr' ? '反映髋关节内旋能力' : (testType === 'hip' ? '反映髋关节外旋能力' : '反映骨盆前移程度');
-            
             currentFeedbackText = `客观记录：${angleDeg.toFixed(1)}° (${ability})`;
             thresholdFeedback.innerText = currentFeedbackText;
             thresholdFeedback.className = `mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-[11px] sm:text-xs border-2 bg-indigo-500/20 border-indigo-500 text-indigo-300 z-10`;
@@ -677,6 +686,7 @@
             else { speak("请重新获取照片。"); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
 
+        // 【核心升级】：调用原生分享API无缝存入 iPhone 相册
         function generateAndDownloadWatermark() {
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈'), sName = tSide === 'L'?'左侧':'右侧';
@@ -692,8 +702,33 @@
             tCtx.textAlign = 'right'; tCtx.fillStyle = 'rgba(203, 213, 225, 0.9)'; tCtx.font = `bold ${Math.max(14, tCanvas.height * 0.022)}px sans-serif`; tCtx.fillText(dateStr, tCanvas.width - 20, tCanvas.height - barHeight + 35);
             tCtx.fillStyle = 'rgba(100, 116, 139, 0.7)'; tCtx.font = `italic bold ${Math.max(16, tCanvas.height * 0.025)}px sans-serif`; tCtx.fillText("@宋教头 | PelvicScan Pro", tCanvas.width - 20, tCanvas.height - barHeight + 70);
 
-            const link = document.createElement('a'); link.download = `${sName}${tName}_${now.getTime()}.jpg`; link.href = tCanvas.toDataURL('image/jpeg', 0.95); link.click();
+            // 转为 Blob 并调用 iPhone 原生分享菜单
+            tCanvas.toBlob(async (blob) => {
+                const filename = `${sName}${tName}_${now.getTime()}.jpg`;
+                const file = new File([blob], filename, { type: 'image/jpeg' });
+                
+                // 判断是否支持 Web Share API (Safari 完美支持)
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '评估图存入相册',
+                        });
+                        // 用户在原生菜单点“保存图像”后直接存入照片APP
+                        return; 
+                    } catch (err) {
+                        console.log('用户取消分享或分享失败', err);
+                    }
+                } else {
+                    // 如果不支持或在PC端，降级为普通下载 (保存到“文件”APP)
+                    const link = document.createElement('a'); 
+                    link.download = filename; 
+                    link.href = URL.createObjectURL(blob); 
+                    link.click();
+                }
+            }, 'image/jpeg', 0.95);
         }
+
         btnDownload.addEventListener('click', generateAndDownloadWatermark);
 
         btnSaveScore.addEventListener('click', () => {
@@ -709,7 +744,6 @@
                 angle: currentFinalAngle.toFixed(1)
             });
 
-            // 只要左右两边都有值，这个动作就完成
             if (testRecords[tType].L !== null && testRecords[tType].R !== null) {
                 const trBox = document.getElementById(`tracker-${tType}`), fText = document.getElementById(`score-${tType}-final`);
                 trBox.classList.replace('bg-white', 'bg-emerald-50'); trBox.classList.replace('border-slate-100', 'border-emerald-500'); trBox.querySelector('span:first-child').classList.replace('text-slate-400', 'text-emerald-600');
@@ -747,50 +781,66 @@
             const threshold = 5;
             let diagnosis = "Transition";
             let title = "诊断: 过渡/混合骨盆代偿", desc = "", planHTML = "";
+            let orientationText = "骨盆朝向数据复杂，需人工介入分析"; // 新增：朝向变量
 
             // 逻辑 1: 基线 (Left AIC) -> Hip: L>R, SLR: L<R, Sh: L<R
-            if (diffHip > threshold && diffSLR < -threshold && diffSh < -threshold) diagnosis = "LeftAIC";
+            if (diffHip > threshold && diffSLR < -threshold && diffSh < -threshold) {
+                diagnosis = "LeftAIC";
+                orientationText = "整体向右定向，左侧骨盆前倾";
+            }
             // 逻辑 2: 横向 (Lateral) -> Hip: L>R, SLR: L<R, Sh: L>R
-            else if (diffHip > threshold && diffSLR < -threshold && diffSh > threshold) diagnosis = "Lateral";
+            else if (diffHip > threshold && diffSLR < -threshold && diffSh > threshold) {
+                diagnosis = "Lateral";
+                orientationText = "左臀部明显被向上推高固定";
+            }
             // 逻辑 3: 斜轴 (Oblique Axis) -> Hip: L<R, SLR: L>R, Sh: L<R
-            else if (diffHip < -threshold && diffSLR > threshold && diffSh < -threshold) diagnosis = "Oblique";
+            else if (diffHip < -threshold && diffSLR > threshold && diffSh < -threshold) {
+                diagnosis = "Oblique";
+                orientationText = "左侧极度靠前，呈对角线旋转";
+            }
             // 逻辑 4: 无明显侧倾 (对称受限/双侧前倾)
-            else if (Math.abs(diffHip) <= 8 && Math.abs(diffSLR) <= 8 && Math.abs(diffSh) <= 8) diagnosis = "Anterior";
+            else if (Math.abs(diffHip) <= 8 && Math.abs(diffSLR) <= 8 && Math.abs(diffSh) <= 8) {
+                diagnosis = "Anterior";
+                orientationText = "骨盆整体前倾（双侧均匀受限）";
+            }
             // 模糊匹配兜底
             else {
                 let scoreLeftAIC = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh < 0 ? 1 : 0);
                 let scoreLateral = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh > 0 ? 1 : 0);
                 let scoreOblique = (diffHip < 0 ? 1 : 0) + (diffSLR > 0 ? 1 : 0) + (diffSh < 0 ? 1 : 0);
-                if (scoreLeftAIC >= 2 && scoreLeftAIC >= scoreLateral && scoreLeftAIC >= scoreOblique) diagnosis = "LeftAIC";
-                else if (scoreLateral >= 2 && scoreLateral >= scoreOblique) diagnosis = "Lateral";
-                else diagnosis = "Oblique";
+                if (scoreLeftAIC >= 2 && scoreLeftAIC >= scoreLateral && scoreLeftAIC >= scoreOblique) { diagnosis = "LeftAIC"; orientationText = "偏向 Left AIC：整体向右定向，左侧骨盆前倾"; }
+                else if (scoreLateral >= 2 && scoreLateral >= scoreOblique) { diagnosis = "Lateral"; orientationText = "偏向横向侧倾：左臀部明显被向上推高"; }
+                else { diagnosis = "Oblique"; orientationText = "偏向斜轴：左侧极度靠前，呈对角线旋转"; }
             }
 
             const titleEl = document.getElementById('final-result-title');
             const descEl = document.getElementById('final-result-desc');
             const listEl = document.getElementById('final-exercise-list');
+            const orientationEl = document.getElementById('final-pelvic-orientation'); // 绑定朝向UI
+            
+            orientationEl.innerText = orientationText;
 
             if (diagnosis === "LeftAIC") {
-                titleEl.innerText = "诊断: 基线偏位 (Left AIC)"; titleEl.className = "text-xl sm:text-2xl font-black text-indigo-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                titleEl.innerText = "诊断: 基线偏位 (Left AIC)"; titleEl.className = "text-xl sm:text-2xl font-black text-indigo-600 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight";
                 descEl.innerText = "骨盆整体向右定向。左侧骨盆比右侧更前倾，导致左侧拥有更多外旋，右侧拥有更多内旋。这是人体不对称的初始基线代偿。";
                 listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">1.</span> PRI 90/90 支持左脚在墙上的交替交叉 (只做左脚在墙)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">2.</span> PRI 左膝向膝牵拉 (只做一边)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">3.</span> PRI 右侧向右心尖扩张,左臂伸展和左内收肌 (只做一边)</li>`;
             } else if (diagnosis === "Lateral") {
-                titleEl.innerText = "诊断: 横向侧倾 (Lateral Tilt)"; titleEl.className = "text-xl sm:text-2xl font-black text-blue-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                titleEl.innerText = "诊断: 横向侧倾 (Lateral Tilt)"; titleEl.className = "text-xl sm:text-2xl font-black text-blue-600 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight";
                 descEl.innerText = "左臀部明显高于右侧，骨盆仿佛从左侧被整体向上推挤。左侧保留较多外旋，但右侧内旋功能被左侧的升高'固定'而限制。";
                 listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">1.</span> PRI 右侧向左内收肌拉回 (只做右侧躺)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">2.</span> PRI 交替循环步态</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">3.</span> PRI 左侧躺着右侧 FA 外展 (只左侧躺)</li>`;
             } else if (diagnosis === "Oblique") {
-                titleEl.innerText = "诊断: 斜轴倾斜 (Oblique Axis)"; titleEl.className = "text-xl sm:text-2xl font-black text-rose-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                titleEl.innerText = "诊断: 斜轴倾斜 (Oblique Axis)"; titleEl.className = "text-xl sm:text-2xl font-black text-rose-600 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight";
                 descEl.innerText = "最深度的代偿：左侧骨盆极度靠前且偏高，骨盆沿对角线斜轴定向。左侧因太靠前而丧失外旋能力，可能伴随胸椎代偿。";
                 listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">1.</span> 左侧靠右推进 (单侧)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">2.</span> 左侧卧时右侧臀大肌促进 (单侧)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">3.</span> PRI 右侧向左内收肌拉回 (单侧)</li>
                                     <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">4.</span> 补偿偏差的仰卧交叉连接 (每侧5次呼吸)</li>`;
             } else {
-                titleEl.innerText = "诊断: 无侧倾 (双侧受限)"; titleEl.className = "text-xl sm:text-2xl font-black text-teal-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                titleEl.innerText = "诊断: 无侧倾 (双侧受限)"; titleEl.className = "text-xl sm:text-2xl font-black text-teal-600 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight";
                 descEl.innerText = "左右差异不明显（小于10度）。请排查是否为双侧骨盆前倾导致的空间受限。建议延长阶段一基础训练的执行时间。";
                 listEl.innerHTML = `<li class="flex items-start gap-1.5 text-teal-600 font-bold">请继续保持阶段一的 5 项基础呼吸与释放训练，激活侧腹肌，避免过度努力。</li>`;
             }
@@ -805,7 +855,7 @@
             setTimeout(() => document.getElementById('final-report-section').scrollIntoView({ behavior: 'smooth', block: 'end' }), 300);
         }
 
-        // Dragging & Interaction (unchanged)
+        // Dragging & Interaction
         function getEventCoords(e) {
             const rect = canvas.getBoundingClientRect(), scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
             let cx = e.clientX, cy = e.clientY; if (e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
