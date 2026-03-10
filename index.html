@@ -14,7 +14,6 @@
         #imageCanvas { touch-action: none; }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* 隐藏滚动条但保留功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -27,13 +26,11 @@
         <div class="bg-slate-900 px-6 pt-8 pb-5 text-center relative overflow-hidden">
             <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
             
-            <!-- 语音助手开关 -->
             <button id="voice-toggle" class="absolute top-5 left-5 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 border border-slate-600 text-slate-400 hover:text-white transition-colors" title="开启/关闭语音助手">
                 <svg id="icon-voice-off" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
                 <svg id="icon-voice-on" class="w-4 h-4 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.898a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
             </button>
 
-            <!-- 历史记录入口 -->
             <button id="btn-show-history" class="absolute top-5 right-5 z-20 flex items-center justify-center w-8 h-8 rounded-full bg-slate-800 border border-slate-600 text-slate-400 hover:text-white transition-colors" title="历史评估档案">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             </button>
@@ -43,14 +40,12 @@
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300 italic drop-shadow-md">PelvicScan</span>
                     <span class="text-xl text-slate-200 font-bold">Pro</span>
                 </h1>
-                <h2 class="text-sm font-bold text-slate-300 mb-4 tracking-[0.15em] uppercase">AI 肌骨力学智能评估</h2>
+                <h2 class="text-sm font-bold text-slate-300 mb-4 tracking-[0.15em] uppercase">PRI 临床级骨盆评估</h2>
                 
                 <div class="flex flex-col items-center mt-2 relative">
                     <p class="text-slate-200 text-[11px] sm:text-xs font-medium leading-relaxed bg-slate-800/80 px-4 py-2 rounded-full border border-slate-600/50 shadow-inner backdrop-blur-sm relative z-10">
-                        双侧对称评估，精准解析 PEC 代偿模式
+                        双侧对比扫描，精准解析 PEC 代偿与骨盆旋转
                     </p>
-                    
-                    <!-- 专属高级水印 -->
                     <div class="w-full flex justify-end mt-3 sm:pr-2">
                         <div class="flex items-center gap-2 cursor-default transition-opacity duration-300 opacity-60 hover:opacity-100">
                             <div class="flex flex-col items-end">
@@ -67,11 +62,9 @@
             </div>
         </div>
 
-        <!-- AI 引擎加载状态 -->
         <div id="ai-loading" class="flex flex-col items-center justify-center p-10 bg-indigo-50/50 border-b border-indigo-100">
             <svg class="animate-spin h-8 w-8 text-indigo-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             <p class="text-sm font-bold text-indigo-700">正在加载高精度双侧视觉引擎...</p>
-            <p class="text-xs text-indigo-400 mt-1">首次加载可能需要几秒钟，请稍候</p>
         </div>
 
         <div id="main-content" class="p-5 sm:p-6 flex flex-col gap-6 hidden">
@@ -83,58 +76,55 @@
                     <div class="flex text-[9px] text-slate-400 mb-1 gap-1 font-mono">
                         <span>L:<span id="score-slr-L">--</span></span> <span>R:<span id="score-slr-R">--</span></span>
                     </div>
-                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-slr-final">待测试</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-slr-final">待完成</span>
                 </div>
                 <div id="tracker-hip" class="flex-1 flex flex-col items-center justify-center py-2 bg-white rounded-lg border border-slate-100 shadow-sm transition-colors">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">主动髋屈曲</span>
                     <div class="flex text-[9px] text-slate-400 mb-1 gap-1 font-mono">
                         <span>L:<span id="score-hip-L">--</span></span> <span>R:<span id="score-hip-R">--</span></span>
                     </div>
-                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-hip-final">待测试</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-hip-final">待完成</span>
                 </div>
                 <div id="tracker-shoulder" class="flex-1 flex flex-col items-center justify-center py-2 bg-white rounded-lg border border-slate-100 shadow-sm transition-colors">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">主动肩屈</span>
                     <div class="flex text-[9px] text-slate-400 mb-1 gap-1 font-mono">
                         <span>L:<span id="score-shoulder-L">--</span></span> <span>R:<span id="score-shoulder-R">--</span></span>
                     </div>
-                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-shoulder-final">待测试</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-300" id="score-shoulder-final">待完成</span>
                 </div>
             </div>
 
-            <!-- 步骤 1：选择测试项目与侧别 -->
             <div class="flex flex-col gap-2">
                 <label class="block text-xs sm:text-sm font-bold text-slate-700">1. 选择当前拍摄项目：</label>
                 <div class="grid grid-cols-3 gap-2">
                     <label class="cursor-pointer">
                         <input type="radio" name="testType" value="slr" class="peer hidden" checked>
-                        <div class="text-center py-2 px-1 text-xs font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动直腿抬高</div>
+                        <div class="text-center py-2 px-1 text-[11px] font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动直腿抬高</div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="testType" value="hip" class="peer hidden">
-                        <div class="text-center py-2 px-1 text-xs font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动髋屈曲</div>
+                        <div class="text-center py-2 px-1 text-[11px] font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动髋屈曲</div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="testType" value="shoulder" class="peer hidden">
-                        <div class="text-center py-2 px-1 text-xs font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动肩屈</div>
+                        <div class="text-center py-2 px-1 text-[11px] font-bold rounded-lg border-2 border-slate-200 text-slate-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 transition-all shadow-sm">主动肩屈</div>
                     </label>
                 </div>
                 <div class="flex p-1 bg-slate-100 rounded-lg shadow-inner mt-1 border border-slate-200">
                     <label class="flex-1 cursor-pointer relative">
                         <input type="radio" name="testSide" value="L" class="peer hidden" checked>
-                        <div class="text-center py-1.5 text-xs font-bold rounded-md text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all border border-transparent peer-checked:border-slate-200">当前侧: 左边 (L)</div>
+                        <div class="text-center py-1.5 text-xs font-bold rounded-md text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all border border-transparent peer-checked:border-slate-200">当前侧: 左侧 (L)</div>
                     </label>
                     <label class="flex-1 cursor-pointer relative">
                         <input type="radio" name="testSide" value="R" class="peer hidden">
-                        <div class="text-center py-1.5 text-xs font-bold rounded-md text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all border border-transparent peer-checked:border-slate-200">当前侧: 右边 (R)</div>
+                        <div class="text-center py-1.5 text-xs font-bold rounded-md text-slate-500 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition-all border border-transparent peer-checked:border-slate-200">当前侧: 右侧 (R)</div>
                     </label>
                 </div>
             </div>
 
-            <!-- 步骤 2：获取照片 (三种核心方式) -->
             <div>
                 <label class="block text-xs sm:text-sm font-bold text-slate-700 mb-2">2. 录入姿态 (推荐使用实时捕捉)</label>
                 <div class="flex flex-col gap-2">
-                    <!-- 实时动态捕捉 (调用视频) -->
                     <button id="btn-start-camera" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
                         <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         进入实时动态捕捉模式
@@ -152,22 +142,18 @@
                 </div>
             </div>
 
-            <!-- 画布容器 (展示AI识别或实时视频结果) -->
+            <!-- 画布容器 -->
             <div class="relative w-full bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center min-h-[200px] hidden" id="canvas-container">
                 <canvas id="imageCanvas" class="w-full h-auto object-contain cursor-crosshair"></canvas>
                 <video id="videoElement" class="hidden" playsinline autoplay muted></video>
                 
-                <!-- 实时模式下的覆盖 UI (全新升级版：自动锁定提示 + 仪表盘) -->
                 <div id="live-overlay" class="absolute inset-0 flex flex-col items-center justify-between z-20 hidden fade-in pointer-events-none p-4 pb-6">
-                    <!-- 顶部科幻仪表盘 -->
                     <div class="mt-4 bg-slate-900/80 backdrop-blur-md px-8 py-4 rounded-3xl text-white font-bold flex flex-col items-center shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-slate-600/50 pointer-events-auto">
                         <span id="live-status-text" class="text-xs text-emerald-400 mb-1 flex items-center gap-1.5 tracking-wider transition-colors">
                             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> 自动追踪最高点中...
                         </span>
                         <span class="text-5xl font-mono tracking-tighter" id="live-angle-display">0.0°</span>
                     </div>
-
-                    <!-- 底部手动保底按钮 -->
                     <button id="btn-lock-frame" class="pointer-events-auto bg-slate-800/90 backdrop-blur-sm border border-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-full font-bold text-sm tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-transform">
                         提前手动锁定
                     </button>
@@ -179,7 +165,7 @@
                 </div>
             </div>
 
-            <!-- 动态图例与微调提示 -->
+            <!-- 微调提示 -->
             <div id="drag-instruction" class="hidden flex flex-col gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
                     <p class="text-[11px] sm:text-xs font-medium text-slate-500 leading-relaxed">
@@ -196,9 +182,8 @@
             <div id="result-board" class="hidden bg-slate-800 p-5 rounded-2xl shadow-lg border border-slate-700 flex flex-col items-center gap-2 relative overflow-hidden">
                 <span class="text-slate-400 text-xs font-bold uppercase tracking-widest" id="current-board-title">单侧测量结果</span>
                 <div class="text-5xl font-black text-white z-10" id="display-angle">0.0°</div>
-                <div id="threshold-feedback" class="mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-xs sm:text-sm border-2 transition-colors z-10"></div>
+                <div id="threshold-feedback" class="mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-[11px] sm:text-xs border-2 transition-colors z-10"></div>
 
-                <!-- 【修改】：将单一按钮改为“重拍”与“录入”的组合按钮组 -->
                 <div class="flex gap-2 mt-4 w-full z-10">
                     <button id="retake-btn" class="flex-[1] py-3.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl font-bold shadow-md transition-transform active:scale-[0.98] flex items-center justify-center gap-1 text-sm sm:text-base border border-slate-600">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -211,11 +196,11 @@
                 </div>
                 
                 <button id="download-btn" class="mt-3 text-[10px] sm:text-xs text-slate-400 hover:text-white underline underline-offset-4 transition-colors z-10">
-                    仅保存当前单项截图
+                    仅保存当前带水印单项截图
                 </button>
             </div>
 
-            <!-- 终极报告生成区 -->
+            <!-- 终极报告生成区 (基于 PRI 左/右差值比对) -->
             <div id="final-report-section" class="hidden fade-in bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 p-5 sm:p-6 rounded-2xl shadow-lg mt-2 flex flex-col items-center relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-200/40 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-200/40 rounded-full blur-2xl pointer-events-none"></div>
@@ -223,19 +208,37 @@
                 <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-3 shadow-inner z-10">
                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4A9 9 0 0112 21a9 9 0 010-18z"></path></svg>
                 </div>
-                <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-2 z-10">双侧综合评估结论</h2>
+                <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-2 z-10">肌骨力学综合诊断结论</h2>
                 
-                <div id="final-result-title" class="text-2xl sm:text-3xl font-black text-indigo-700 mb-2 sm:mb-3 tracking-wide z-10 text-center">获取中...</div>
-                <p id="final-result-desc" class="text-slate-600 text-center text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-indigo-50 shadow-sm z-10">--</p>
+                <div id="final-result-title" class="text-xl sm:text-2xl font-black text-indigo-700 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight">获取中...</div>
+                <p id="final-result-desc" class="text-slate-600 text-left text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-50 shadow-sm z-10">--</p>
 
-                <div class="w-full flex flex-col gap-2 z-10">
-                    <h3 class="text-xs sm:text-sm font-bold text-slate-700 mb-1 flex items-center gap-1">
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        第一阶段专属康复计划
-                    </h3>
-                    <ul id="final-exercise-list" class="text-xs sm:text-sm text-slate-600 space-y-2 bg-white/90 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm">
-                        <!-- JS动态填充 -->
-                    </ul>
+                <div class="w-full flex flex-col gap-4 z-10">
+                    <!-- 阶段一：通用基础 -->
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            阶段一：基础地基修复 (第1-2周)
+                        </h3>
+                        <ul class="text-[11px] sm:text-xs text-slate-600 space-y-2 bg-white/90 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <li class="flex items-start gap-1.5"><span class="font-bold text-emerald-500">1.</span> PRI短静坐呼吸训练 (3组, 每组5次呼吸)</li>
+                            <li class="flex items-start gap-1.5"><span class="font-bold text-emerald-500">2.</span> PRI侧卧夹球剪切力训练 (3组, 每组5次呼吸)</li>
+                            <li class="flex items-start gap-1.5"><span class="font-bold text-emerald-500">3.</span> 推球四足呼吸 (3组, 每组5次呼吸)</li>
+                            <li class="flex items-start gap-1.5"><span class="font-bold text-emerald-500">4.</span> PRI股直肌仰卧半伸展 (3组, 每侧15次)</li>
+                            <li class="flex items-start gap-1.5"><span class="font-bold text-emerald-500">5.</span> TFL抑制训练 (3组, 10次)</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 阶段二：针对性进阶 -->
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                            阶段二：针对性进阶训练 (第3-4周)
+                        </h3>
+                        <ul id="final-exercise-list" class="text-[11px] sm:text-xs text-slate-600 space-y-2 bg-white/90 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm">
+                            <!-- JS动态填充 -->
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -252,18 +255,17 @@
                 </h2>
                 <button id="btn-close-history" class="text-slate-400 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div id="history-list" class="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-3 no-scrollbar">
-                <!-- 动态填充 -->
-            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-3 no-scrollbar"></div>
             <div class="p-4 bg-white border-t border-slate-100">
                 <button id="btn-clear-history" class="w-full py-2.5 text-sm font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors">清空所有记录</button>
             </div>
         </div>
     </div>
 
+    <!-- 隐藏标签 -->
     <img id="sourceImage" class="hidden">
 
-    <!-- 专属高级悬浮水印徽章 -->
+    <!-- 悬浮水印徽章 -->
     <div class="fixed bottom-6 right-4 sm:bottom-10 sm:right-10 z-50 flex items-center gap-2.5 bg-slate-800/40 backdrop-blur-md pl-1.5 pr-4 py-1.5 rounded-full shadow-lg border border-slate-600/30 cursor-default transition-all duration-300 opacity-60 hover:opacity-100">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-700/40 flex items-center justify-center shadow-inner border border-slate-500/30">
             <span class="text-slate-300/80 text-sm sm:text-base font-black font-serif italic">S</span>
@@ -297,7 +299,7 @@
         const btnReset = document.getElementById('reset-btn');
         const btnDownload = document.getElementById('download-btn');
         const btnSaveScore = document.getElementById('save-score-btn');
-        const btnRetake = document.getElementById('retake-btn'); // 【新增】重拍按钮引用
+        const btnRetake = document.getElementById('retake-btn');
         const currentBoardTitle = document.getElementById('current-board-title');
 
         const btnVoiceToggle = document.getElementById('voice-toggle');
@@ -307,8 +309,12 @@
         const historyList = document.getElementById('history-list');
         const btnClearHistory = document.getElementById('btn-clear-history');
 
-        // Global State
-        let testRecords = { slr: { L: null, R: null, final: null }, hip: { L: null, R: null, final: null }, shoulder: { L: null, R: null, final: null } };
+        // Global State (Keep track of both Left and Right)
+        let testRecords = { 
+            slr: { L: null, R: null }, 
+            hip: { L: null, R: null }, 
+            shoulder: { L: null, R: null } 
+        };
         let detector;
         let activePoints = []; 
         let originalAiPoints = []; 
@@ -316,15 +322,14 @@
         let dotHitRadius = 35; 
         let currentFinalAngle = 0; 
         let currentFeedbackText = ""; 
-        let lastCaptureMethod = null; // 【新增】记录上一次的拍摄方式 (live/static)
+        let lastCaptureMethod = null; 
         
-        // Voice & Live Tracking State
         let voiceEnabled = false;
         let isLiveTracking = false;
         let liveStream = null;
         let liveRequestID = null;
 
-        // Auto-Peak Detection States
+        // Auto-Peak Detection
         let liveMaxAngle = 0;
         let liveMaxFrameDataURL = null;
         let liveMaxPoints = [];
@@ -332,7 +337,6 @@
         let isHolding = false;
         let holdStartTime = 0;
 
-        // 【新增辅助函数】保存最高点截图和点位
         function saveFrameToBuffer() {
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
@@ -341,7 +345,7 @@
             liveMaxPoints = activePoints.map(p => ({...p}));
         }
 
-        // --- 1. Voice Assistant Module ---
+        // --- 1. Voice Assistant ---
         btnVoiceToggle.addEventListener('click', () => {
             voiceEnabled = !voiceEnabled;
             document.getElementById('icon-voice-on').classList.toggle('hidden', !voiceEnabled);
@@ -349,7 +353,6 @@
             btnVoiceToggle.classList.toggle('bg-slate-800', !voiceEnabled);
             btnVoiceToggle.classList.toggle('bg-indigo-900', voiceEnabled);
             btnVoiceToggle.classList.toggle('border-emerald-500/50', voiceEnabled);
-            
             if (voiceEnabled) speak("语音教练向导已开启。");
             else window.speechSynthesis.cancel();
         });
@@ -358,18 +361,15 @@
             if (!voiceEnabled || !window.speechSynthesis) return;
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-CN';
-            utterance.rate = 1.1; 
-            utterance.pitch = 1.0;
+            utterance.lang = 'zh-CN'; utterance.rate = 1.1; utterance.pitch = 1.0;
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- 2. History Storage Module ---
-        function loadHistory() { return localStorage.getItem('pelvic_history') ? JSON.parse(localStorage.getItem('pelvic_history')) : []; }
+        // --- 2. History Storage ---
+        function loadHistory() { return localStorage.getItem('pelvic_history_v2') ? JSON.parse(localStorage.getItem('pelvic_history_v2')) : []; }
         function saveHistoryToStorage(recordStr) {
-            const hist = loadHistory();
-            hist.unshift(recordStr); 
-            localStorage.setItem('pelvic_history', JSON.stringify(hist));
+            const hist = loadHistory(); hist.unshift(recordStr); 
+            localStorage.setItem('pelvic_history_v2', JSON.stringify(hist));
         }
 
         btnShowHistory.addEventListener('click', () => {
@@ -381,35 +381,29 @@
                     const card = document.createElement('div');
                     card.className = 'bg-white p-3.5 rounded-xl shadow-sm border border-slate-100';
                     
-                    // 【核心升级】：区分单项记录和综合报告的档案展示
                     if (item.type === 'single') {
                         card.innerHTML = `
                             <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-50">
                                 <span class="text-xs font-bold text-slate-500">${item.date}</span>
-                                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded">单侧评估</span>
+                                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded">单侧打卡</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="font-bold text-slate-700">${item.name}</span>
                                 <div class="flex items-center gap-2">
                                     <span class="font-mono font-black text-indigo-600 text-base">${item.angle}°</span>
-                                    <span class="text-[10px] text-slate-500">${item.result}</span>
                                 </div>
                             </div>`;
                     } else {
-                        let trendHTML = '';
-                        if (index < hist.length - 1 && hist[index + 1].type !== 'single') {
-                            const diff = item.slr - hist[index + 1].slr; 
-                            trendHTML = diff !== 0 ? `<span class="text-[10px] ${diff > 0 ? 'text-emerald-500' : 'text-rose-500'}">(${diff>0?'+':''}${diff}°)</span>` : '';
-                        }
                         card.innerHTML = `
                             <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-50">
                                 <span class="text-xs font-bold text-slate-500">${item.date}</span>
-                                <span class="text-xs font-black ${item.result.includes('A') ? 'text-indigo-500' : 'text-teal-500'} bg-slate-50 px-2 py-0.5 rounded">${item.result}</span>
+                                <span class="text-[10px] font-black text-white bg-indigo-500 px-2 py-0.5 rounded shadow-sm">综合诊断</span>
                             </div>
+                            <div class="text-sm font-bold text-slate-700 mb-2">${item.result}</div>
                             <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                                <div class="flex flex-col"><span class="text-slate-400 mb-0.5 text-[10px]">直腿抬高</span><span class="font-mono font-bold text-slate-700">${item.slr}° ${trendHTML}</span></div>
-                                <div class="flex flex-col border-x border-slate-100"><span class="text-slate-400 mb-0.5 text-[10px]">髋屈曲</span><span class="font-mono font-bold text-slate-700">${item.hip}°</span></div>
-                                <div class="flex flex-col"><span class="text-slate-400 mb-0.5 text-[10px]">肩屈</span><span class="font-mono font-bold text-slate-700">${item.shoulder}°</span></div>
+                                <div class="flex flex-col"><span class="text-slate-400 mb-0.5 text-[10px]">直抬腿(L/R)</span><span class="font-mono font-bold text-slate-700">${item.slrL}° / ${item.slrR}°</span></div>
+                                <div class="flex flex-col border-x border-slate-100"><span class="text-slate-400 mb-0.5 text-[10px]">髋屈曲(L/R)</span><span class="font-mono font-bold text-slate-700">${item.hipL}° / ${item.hipR}°</span></div>
+                                <div class="flex flex-col"><span class="text-slate-400 mb-0.5 text-[10px]">肩屈(L/R)</span><span class="font-mono font-bold text-slate-700">${item.shL}° / ${item.shR}°</span></div>
                             </div>`;
                     }
                     historyList.appendChild(card);
@@ -420,47 +414,31 @@
 
         btnCloseHistory.addEventListener('click', () => historyModal.classList.add('hidden'));
         btnClearHistory.addEventListener('click', () => {
-            if(confirm("确定要清空所有客户评估档案吗？")) {
-                localStorage.removeItem('pelvic_history');
-                historyModal.classList.add('hidden');
-            }
+            if(confirm("确定要清空所有客户评估档案吗？")) { localStorage.removeItem('pelvic_history_v2'); historyModal.classList.add('hidden'); }
         });
 
-        // --- 3. AI Initialization & UI Reset ---
+        // --- 3. Initialization & Reset ---
         async function initAI() {
             try {
-                await tf.setBackend('webgl');
-                await tf.ready();
+                await tf.setBackend('webgl'); await tf.ready();
                 detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER });
                 document.getElementById('ai-loading').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
-            } catch (error) {
-                document.getElementById('ai-loading').innerHTML = `<p class="text-rose-500 font-bold">AI 模型加载失败，请检查网络。</p>`;
-            }
+            } catch (error) { document.getElementById('ai-loading').innerHTML = `<p class="text-rose-500 font-bold">AI 模型加载失败。</p>`; }
         }
         window.onload = initAI;
 
         function resetCanvasForNewUpload() {
             stopLiveTracking(); 
-            canvasContainer.classList.add('hidden');
-            dragInstruction.classList.add('hidden');
-            resultBoard.classList.add('hidden');
-            currentPoses = [];
+            canvasContainer.classList.add('hidden'); dragInstruction.classList.add('hidden'); resultBoard.classList.add('hidden'); currentPoses = [];
         }
         radioInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
         sideInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
 
-        // --- 4. 实时动态捕捉 (峰值自动锁定算法) ---
+        // --- 4. Live Tracking (Strict Isometric Hold Algorithm) ---
         btnStartCamera.addEventListener('click', async () => {
-            resetCanvasForNewUpload();
-            lastCaptureMethod = 'live'; // 【新增】记忆模式
-            // 重置峰值算法状态
-            liveMaxAngle = 0;
-            liveMaxFrameDataURL = null;
-            liveMaxPoints = [];
-            angleHistory = [];
-            isHolding = false;
-            holdStartTime = 0;
+            resetCanvasForNewUpload(); lastCaptureMethod = 'live';
+            liveMaxAngle = 0; liveMaxFrameDataURL = null; liveMaxPoints = []; angleHistory = []; isHolding = false; holdStartTime = 0;
             document.getElementById('live-angle-display').innerText = '0.0°';
             document.getElementById('live-status-text').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> 自动追踪最高点中...`;
 
@@ -471,43 +449,29 @@
                 videoElement.play();
                 
                 canvas.width = videoElement.videoWidth; canvas.height = videoElement.videoHeight;
-                isLiveTracking = true;
+                isLiveTracking = true; canvasContainer.classList.remove('hidden'); liveOverlay.classList.remove('hidden');
                 
-                canvasContainer.classList.remove('hidden');
-                liveOverlay.classList.remove('hidden');
+                const tType = document.querySelector('input[name="testType"]:checked').value;
+                const tSideName = document.querySelector('input[name="testSide"]:checked').value === 'L' ? '左侧' : '右侧';
                 
-                // 【核心升级】：根据不同测试项目，播放专业纠错指导语音
-                const testType = document.querySelector('input[name="testType"]:checked').value;
-                const testSideName = document.querySelector('input[name="testSide"]:checked').value === 'L' ? '左侧' : '右侧';
-                
-                let instructionSpeech = "";
-                if (testType === 'slr') {
-                    instructionSpeech = `即将进行${testSideName}主动直腿抬高测试。请仰卧平躺，对侧腿放松压实床面，测试腿完全伸直锁死，脚背绷起，慢慢抬高。注意：如出现膝盖弯曲、对侧腿离开床面、大腿向外打开或骨盆转动，请立即停在代偿瞬间。系统将自动锁定，请开始动作。`;
-                } else if (testType === 'hip') {
-                    instructionSpeech = `即将进行${testSideName}主动髋屈曲测试。请仰卧平躺，将膝盖向胸口拉起。注意：不需要拼命追求幅度，一旦出现同侧骨盆卷起抬高、大腿向外侧打开，或对侧腿离开床面，请立即停止。系统将自动锁定，请开始动作。`;
-                } else if (testType === 'shoulder') {
-                    instructionSpeech = `即将进行${testSideName}主动肩屈测试。请仰卧平躺，测试手臂掌心朝上，手肘自然微屈，向后上方抬起。注意：如果发现手臂开始旋转、挺胸导致腰部离开床面、手臂外展或手肘弯曲，请立即停止。系统将自动锁定，请开始动作。`;
-                }
-                
-                speak(instructionSpeech);
+                let speech = "";
+                if (tType === 'slr') speech = `即将进行${tSideName}主动直腿抬高测试。请仰卧平躺，测试腿完全伸直抬高。如果出现膝盖弯曲、大腿外展或骨盆转动，请立即停在代偿瞬间并保持2秒。`;
+                else if (tType === 'hip') speech = `即将进行${tSideName}主动髋屈曲测试。将膝盖向胸口拉起。出现骨盆卷起或大腿向外打开时，请立即停止并保持2秒。`;
+                else speech = `即将进行${tSideName}主动肩屈测试。手臂向后上方抬起。如果发现手臂旋转或挺胸代偿，请立即停止并保持2秒。`;
+                speak(speech);
                 
                 livePoseLoop();
-            } catch (e) {
-                alert("无法调用摄像头，请检查浏览器权限。");
-            }
+            } catch (e) { alert("无法调用摄像头权限。"); }
         });
 
         async function livePoseLoop() {
             if (!isLiveTracking) return;
             try {
                 const poses = await detector.estimatePoses(videoElement);
-                if (!isLiveTracking) return; // double check
-
-                if (poses.length > 0) {
-                    extractPointsFromPose(poses[0], true);
-                } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                if (!isLiveTracking) return;
+                if (poses.length > 0) extractPointsFromPose(poses[0], true);
+                else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
                     document.getElementById('live-angle-display').innerText = '--°';
                 }
             } catch (e) {}
@@ -521,45 +485,26 @@
             liveOverlay.classList.add('hidden');
         }
 
-        // 核心锁定触发器 (由手动或AI算法触发)
         function triggerAutoLock() {
             if (!isLiveTracking) return;
             stopLiveTracking();
-
-            // 如果算法抓到了帧，使用算法帧；如果刚开相机就点手动，直接截取当前帧
-            if (!liveMaxFrameDataURL) {
-                saveFrameToBuffer();
-                liveMaxAngle = currentFinalAngle || 0;
-            }
-
-            sourceImage.src = liveMaxFrameDataURL;
-            activePoints = liveMaxPoints.map(p => ({...p}));
-            originalAiPoints = activePoints.map(p => ({...p}));
+            if (!liveMaxFrameDataURL) { saveFrameToBuffer(); liveMaxAngle = currentFinalAngle || 0; }
+            sourceImage.src = liveMaxFrameDataURL; activePoints = liveMaxPoints.map(p => ({...p})); originalAiPoints = activePoints.map(p => ({...p}));
             
-            const testType = document.querySelector('input[name="testType"]:checked').value;
-            const testSide = document.querySelector('input[name="testSide"]:checked').value;
-            updateLegend(testType);
-            dragInstruction.classList.remove('hidden');
-            resultBoard.classList.remove('hidden');
+            const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
+            updateLegend(tType); dragInstruction.classList.remove('hidden'); resultBoard.classList.remove('hidden');
             
-            currentFinalAngle = liveMaxAngle;
-            renderCanvasAndResult(sourceImage); 
+            currentFinalAngle = liveMaxAngle; renderCanvasAndResult(sourceImage); 
             setTimeout(() => resultBoard.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
-
-            // 完美还原你的语音播报需求
-            let angleTxt = liveMaxAngle.toFixed(1);
-            let nextSideTxt = testSide === 'L' ? '右侧' : '左侧';
-            speak(`记录完成，角度是${angleTxt}度。确认无误后，请换到另外一侧。`);
+            speak(`角度已锁定为${liveMaxAngle.toFixed(1)}度。`);
         }
 
         btnLockFrame.addEventListener('click', triggerAutoLock);
 
         // --- 5. Static Image Upload ---
         function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            resetCanvasForNewUpload();
-            lastCaptureMethod = 'static'; // 【新增】记忆模式
+            const file = e.target.files[0]; if (!file) return;
+            resetCanvasForNewUpload(); lastCaptureMethod = 'static';
             const reader = new FileReader();
             reader.onload = function(event) {
                 const tempImg = new Image();
@@ -567,9 +512,9 @@
                     const MAX_DIM = 1200; let scale = 1;
                     if (tempImg.width > MAX_DIM || tempImg.height > MAX_DIM) scale = Math.min(MAX_DIM / tempImg.width, MAX_DIM / tempImg.height);
                     canvas.width = tempImg.width * scale; canvas.height = tempImg.height * scale;
-                    const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
-                    tempCanvas.getContext('2d').drawImage(tempImg, 0, 0, tempCanvas.width, tempCanvas.height);
-                    sourceImage.src = tempCanvas.toDataURL('image/jpeg', 0.9);
+                    const tCan = document.createElement('canvas'); tCan.width = canvas.width; tCan.height = canvas.height;
+                    tCan.getContext('2d').drawImage(tempImg, 0, 0, tCan.width, tCan.height);
+                    sourceImage.src = tCan.toDataURL('image/jpeg', 0.9);
                 }
                 tempImg.src = event.target.result;
             }
@@ -578,26 +523,24 @@
 
         sourceImage.onload = function() {
             if(isLiveTracking) return; 
-            canvasContainer.classList.remove('hidden'); analyzingMask.classList.remove('hidden');
-            ctx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
+            canvasContainer.classList.remove('hidden'); analyzingMask.classList.remove('hidden'); ctx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
             setTimeout(async () => {
                 try {
                     const poses = await detector.estimatePoses(sourceImage);
                     analyzingMask.classList.add('hidden');
                     if (poses.length > 0) {
-                        extractPointsFromPose(poses[0], false);
-                        originalAiPoints = activePoints.map(p => ({...p}));
+                        extractPointsFromPose(poses[0], false); originalAiPoints = activePoints.map(p => ({...p}));
                         updateLegend(document.querySelector('input[name="testType"]:checked').value);
                         dragInstruction.classList.remove('hidden'); resultBoard.classList.remove('hidden');
                         renderCanvasAndResult(sourceImage); resultBoard.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                        speak("骨骼扫描完成。");
-                    } else alert("未能识别到清晰姿势，请确认是全身照片！");
+                        speak("识别完成。");
+                    } else alert("未能识别到姿势！");
                 } catch(err) { analyzingMask.classList.add('hidden'); }
             }, 50);
         };
         cameraInput.addEventListener('change', handleImageUpload); albumInput.addEventListener('change', handleImageUpload);
 
-        // --- 6. Pose Extraction Logic ---
+        // --- 6. Pose Extraction & Isometric Logic ---
         function extractPointsFromPose(pose, isLive) {
             const kp = pose.keypoints;
             const lShoulder = getKeypoint(kp, 'left_shoulder'), rShoulder = getKeypoint(kp, 'right_shoulder');
@@ -608,107 +551,68 @@
 
             const shoulder = lShoulder.score > rShoulder.score ? lShoulder : rShoulder;
             const hip = lHip.score > rHip.score ? lHip : rHip;
-            const testType = document.querySelector('input[name="testType"]:checked').value;
-            const bodyThicknessOffset = canvas.height * 0.04; 
+            const tType = document.querySelector('input[name="testType"]:checked').value;
+            const offset = canvas.height * 0.04; 
 
-            if (testType === 'slr') {
-                const isLeftHigher = lAnkle.y < rAnkle.y;
-                const testAnkle = (isLeftHigher && lAnkle.score > 0.1) ? lAnkle : rAnkle;
-                const restingAnkle = testAnkle === lAnkle ? rAnkle : lAnkle;
-                const buttockPivot = { x: hip.x, y: hip.y + bodyThicknessOffset, score: hip.score };
-                let bedRefPoint = restingAnkle.score > 0.2 ? { ...restingAnkle } : { x: buttockPivot.x + (hip.x > shoulder.x ? 1 : -1) * (canvas.width * 0.3), y: buttockPivot.y, score: 1 };
-                activePoints = [bedRefPoint, buttockPivot, { ...testAnkle }];
-            } else if (testType === 'hip') {
-                const isLeftHigher = lKnee.y < rKnee.y;
-                const testKnee = (isLeftHigher && lKnee.score > 0.1) ? lKnee : rKnee;
-                const restingAnkle = testKnee === lKnee ? rAnkle : lAnkle;
-                const restingKnee = testKnee === lKnee ? rKnee : lKnee;
-                const buttockPivot = { x: hip.x, y: hip.y + bodyThicknessOffset, score: hip.score };
-                let bedRefPoint = restingAnkle.score > 0.2 ? { ...restingAnkle } : (restingKnee.score > 0.2 ? { ...restingKnee } : { x: buttockPivot.x + (hip.x > shoulder.x ? 1 : -1) * (canvas.width * 0.3), y: buttockPivot.y, score: 1 });
-                activePoints = [bedRefPoint, buttockPivot, { ...testKnee }];
+            if (tType === 'slr') {
+                const isLeftHigher = lAnkle.y < rAnkle.y; const testAnkle = (isLeftHigher && lAnkle.score > 0.1) ? lAnkle : rAnkle; const restAnkle = testAnkle === lAnkle ? rAnkle : lAnkle;
+                const buttock = { x: hip.x, y: hip.y + offset, score: hip.score };
+                let bed = restAnkle.score > 0.2 ? { ...restAnkle } : { x: buttock.x + (hip.x > shoulder.x ? 1 : -1) * (canvas.width * 0.3), y: buttock.y, score: 1 };
+                activePoints = [bed, buttock, { ...testAnkle }];
+            } else if (tType === 'hip') {
+                const isLeftHigher = lKnee.y < rKnee.y; const testKnee = (isLeftHigher && lKnee.score > 0.1) ? lKnee : rKnee; const restAnkle = testKnee === lKnee ? rAnkle : lAnkle; const restKnee = testKnee === lKnee ? rKnee : lKnee;
+                const buttock = { x: hip.x, y: hip.y + offset, score: hip.score };
+                let bed = restAnkle.score > 0.2 ? { ...restAnkle } : (restKnee.score > 0.2 ? { ...restKnee } : { x: buttock.x + (hip.x > shoulder.x ? 1 : -1) * (canvas.width * 0.3), y: buttock.y, score: 1 });
+                activePoints = [bed, buttock, { ...testKnee }];
             } else {
-                const isLeftHigher = lElbow.y < rElbow.y;
-                const testElbow = (isLeftHigher && lElbow.score > 0.1) ? lElbow : rElbow;
-                const backPivot = { x: shoulder.x, y: shoulder.y + bodyThicknessOffset, score: shoulder.score };
-                const buttockRef = { x: hip.x, y: hip.y + bodyThicknessOffset, score: hip.score };
-                activePoints = [ buttockRef, backPivot, { ...testElbow } ];
+                const isLeftHigher = lElbow.y < rElbow.y; const testElbow = (isLeftHigher && lElbow.score > 0.1) ? lElbow : rElbow;
+                activePoints = [ { x: hip.x, y: hip.y + offset, score: hip.score }, { x: shoulder.x, y: shoulder.y + offset, score: shoulder.score }, { ...testElbow } ];
             }
 
-            // 对于静态图片：防丢失保底；对于实时视频：不保底，直接用下方的防误判拦截
-            if (!isLive) {
-                activePoints.forEach((p, i) => { if (p.x === 0 && p.y === 0) { p.x = canvas.width * (0.3 + i * 0.2); p.y = canvas.height * 0.5; } });
-            }
+            if (!isLive) activePoints.forEach((p, i) => { if (p.x === 0 && p.y === 0) { p.x = canvas.width * (0.3 + i * 0.2); p.y = canvas.height * 0.5; } });
 
-            // 实时模式的峰值算法判定
             if (isLive) {
-                // 【核心升级】：实体防误判工业级过滤网 (Anti-Ghosting Filter)
-                // 1. 确保躯干主轴(肩、髋)在画面内且清晰 (防测家具)
-                const isTorsoVisible = shoulder.score > 0.35 && hip.score > 0.35;
-                // 2. 确保正在测试的肢端(脚踝、膝盖、手肘)清晰可见
-                const isLimbVisible = activePoints[2].score > 0.30;
-
+                const isTorsoVisible = shoulder.score > 0.35 && hip.score > 0.35; const isLimbVisible = activePoints[2].score > 0.30;
                 if (!isTorsoVisible || !isLimbVisible) {
-                    // 如果判定不是人，发出红色警告，彻底切断测角和计时逻辑
-                    document.getElementById('live-status-text').innerHTML = `<span class="text-rose-400 font-bold text-xs tracking-wider bg-rose-950/70 px-3 py-1.5 rounded-full border border-rose-500/50 backdrop-blur-sm animate-pulse shadow-lg">⚠️ 未检测到完整人体，请入镜</span>`;
+                    document.getElementById('live-status-text').innerHTML = `<span class="text-rose-400 font-bold text-xs tracking-wider bg-rose-950/70 px-3 py-1.5 rounded-full border border-rose-500/50 backdrop-blur-sm animate-pulse shadow-lg">⚠️ 请单人全身入镜</span>`;
                     document.getElementById('live-angle-display').innerText = '--°';
-                    isHolding = false;
-                    holdStartTime = 0;
-                    
-                    // 清除错误的绿色线条，只保留真实的摄像机干净画面
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-                    return; // 阻断执行
+                    isHolding = false; holdStartTime = 0;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                    return; 
                 }
 
                 if (activePoints.length === 3) {
+                    if (activePoints[2].score < 0.25) {
+                        document.getElementById('live-status-text').innerHTML = `<span class="text-yellow-400 font-bold text-xs tracking-wider">⚠️ 画面受衣物干扰，请保持姿势...</span>`;
+                        return; 
+                    }
                     const currentAngle = getAngle(activePoints[0], activePoints[1], activePoints[2]);
-                    
-                    // 【算法改进 2：中值平滑滤波】
-                    angleHistory.push(currentAngle);
-                    if (angleHistory.length > 6) angleHistory.shift();
-                    let sortedAngles = [...angleHistory].sort((a, b) => a - b);
-                    let validAngles = sortedAngles.length >= 5 ? sortedAngles.slice(1, -1) : sortedAngles;
-                    let smoothedAngle = validAngles.reduce((a,b)=>a+b, 0) / validAngles.length;
+                    angleHistory.push(currentAngle); if (angleHistory.length > 6) angleHistory.shift();
+                    let sorted = [...angleHistory].sort((a, b) => a - b); let valid = sorted.length >= 5 ? sorted.slice(1, -1) : sorted;
+                    let smoothedAngle = valid.reduce((a,b)=>a+b, 0) / valid.length;
 
                     document.getElementById('live-angle-display').innerText = smoothedAngle.toFixed(1) + '°';
 
-                    // 【核心算法重构】：等长收缩(Isometric Hold)严格判定与防死锁
+                    // 终极防死锁与防作弊 2秒算法
                     if (smoothedAngle > 25) {
                         if (smoothedAngle > liveMaxAngle) {
-                            // 1. 创新高 (发力上抬阶段)
-                            liveMaxAngle = smoothedAngle;
-                            saveFrameToBuffer(); // 永远存最高点那帧
-                            holdStartTime = Date.now(); // 只要在移动创新高，计时器就不断重置
-                            isHolding = true;
+                            liveMaxAngle = smoothedAngle; saveFrameToBuffer(); holdStartTime = Date.now(); isHolding = true;
                             document.getElementById('live-status-text').innerHTML = `<span class="text-emerald-400 font-bold text-xs tracking-wider animate-pulse">正在发力上抬...</span>`;
                         } else if (liveMaxAngle - smoothedAngle <= 5) {
-                            // 2. 停在了最高点附近（允许5度以内的正常肌肉发抖容差）
-                            if (!isHolding) {
-                                isHolding = true;
-                                holdStartTime = Date.now();
-                            }
+                            if (!isHolding) { isHolding = true; holdStartTime = Date.now(); }
                             let holdTime = Date.now() - holdStartTime;
-                            if (holdTime >= 2000) {
-                                triggerAutoLock();
-                                return; // 保持2秒达标，完美咔嚓！
-                            } else {
+                            if (holdTime >= 2000) { triggerAutoLock(); return; } 
+                            else {
                                 let timeLeft = ((2000 - holdTime) / 1000).toFixed(1);
                                 document.getElementById('live-status-text').innerHTML = `<span class="text-rose-500 font-black tracking-widest text-sm shadow-sm px-2 py-1 bg-slate-900/50 rounded-full">🎯 保持住！ ${timeLeft}s 📸</span>`;
                             }
                         } else {
-                            // 3. 【核心修复】：角度突然掉落超过5度 
-                            // -> 判定为“借力甩腿（冲高回落）”或“中途泄力”
-                            // 此时必须把历史最高点“降级”至当前角度，重新寻找客户能真正Hold住的真实活动度！
-                            liveMaxAngle = smoothedAngle;
-                            isHolding = false;
-                            holdStartTime = 0;
+                            // 角度掉落，智能降级寻找真实AROM
+                            liveMaxAngle = smoothedAngle; isHolding = false; holdStartTime = 0;
                             document.getElementById('live-status-text').innerHTML = `<span class="text-amber-400 font-bold text-xs tracking-wider">角度回落，正在重新锚定...</span>`;
                         }
                     } else {
-                        // 4. 完全放下（低于25度）
-                        isHolding = false;
-                        holdStartTime = 0;
-                        liveMaxAngle = 0; // 【关键】：彻底清空记录，防止干扰下一次举腿
+                        isHolding = false; holdStartTime = 0; liveMaxAngle = 0;
                         document.getElementById('live-status-text').innerHTML = `<span class="text-emerald-400 text-xs tracking-wider flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>等待动作开始...</span>`;
                     }
                 }
@@ -716,26 +620,18 @@
             }
         }
 
-        // --- 7. Rendering Engine ---
+        // --- 7. Rendering & Feedback ---
         function renderCanvasAndResult(imgSource = sourceImage) {
             if (activePoints.length !== 3) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(imgSource) ctx.drawImage(imgSource, 0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); if(imgSource) ctx.drawImage(imgSource, 0, 0, canvas.width, canvas.height);
 
             const p1 = activePoints[0], p2 = activePoints[1], p3 = activePoints[2]; 
-            const lineWidth = Math.max(4, canvas.width * 0.008);
-            const drawRadius = Math.max(12, canvas.width * 0.015);
-            const arcRadius = Math.max(40, canvas.width * 0.08);
+            const lineWidth = Math.max(4, canvas.width * 0.008), drawRadius = Math.max(12, canvas.width * 0.015), arcRadius = Math.max(40, canvas.width * 0.08);
 
-            let startAngle = Math.atan2(p1.y - p2.y, p1.x - p2.x);
-            let endAngle = Math.atan2(p3.y - p2.y, p3.x - p2.x);
-            let diff = endAngle - startAngle;
-            while (diff <= -Math.PI) diff += 2 * Math.PI;
-            while (diff > Math.PI) diff -= 2 * Math.PI;
-            let counterclockwise = diff < 0;
+            let startAngle = Math.atan2(p1.y - p2.y, p1.x - p2.x), endAngle = Math.atan2(p3.y - p2.y, p3.x - p2.x);
+            let diff = endAngle - startAngle; while (diff <= -Math.PI) diff += 2*Math.PI; while (diff > Math.PI) diff -= 2*Math.PI;
 
-            ctx.beginPath(); ctx.moveTo(p2.x, p2.y); ctx.arc(p2.x, p2.y, arcRadius, startAngle, endAngle, counterclockwise); ctx.closePath(); ctx.fillStyle = 'rgba(16, 185, 129, 0.25)'; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(p2.x, p2.y); ctx.arc(p2.x, p2.y, arcRadius, startAngle, endAngle, diff<0); ctx.closePath(); ctx.fillStyle = 'rgba(16, 185, 129, 0.25)'; ctx.fill();
             ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y); ctx.strokeStyle = '#10b981'; ctx.lineWidth = lineWidth; ctx.lineJoin = 'round'; ctx.stroke();
 
             const pointColors = ['#ef4444', '#f59e0b', '#3b82f6'];
@@ -750,17 +646,166 @@
             ctx.fillText(`${currentFinalAngle.toFixed(1)}°`, p2.x + arcRadius * 0.2, p2.y - arcRadius * 0.5); ctx.shadowBlur = 0; 
 
             if(!isLiveTracking) {
-                const testType = document.querySelector('input[name="testType"]:checked').value;
-                const testSide = document.querySelector('input[name="testSide"]:checked').value;
+                const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
                 displayAngle.innerText = Math.max(0, currentFinalAngle).toFixed(1) + '°';
-                currentBoardTitle.innerText = `当前测量: ${testSide === 'L' ? '左侧' : '右侧'}`;
-                renderThresholdFeedback(testType, testSide, currentFinalAngle);
+                currentBoardTitle.innerText = `当前测量: ${tSide === 'L' ? '左侧' : '右侧'}`;
+                renderThresholdFeedback(tType, tSide, currentFinalAngle);
             }
         }
 
-        btnReset.addEventListener('click', () => { if (originalAiPoints.length === 3) { activePoints = originalAiPoints.map(p => ({...p})); renderCanvasAndResult(); }});
+        function getAngle(p1, p2, p3) {
+            const a = Math.sqrt(Math.pow(p2.x-p1.x,2)+Math.pow(p2.y-p1.y,2)), b = Math.sqrt(Math.pow(p2.x-p3.x,2)+Math.pow(p2.y-p3.y,2)), c = Math.sqrt(Math.pow(p3.x-p1.x,2)+Math.pow(p3.y-p1.y,2));
+            return Math.acos((a*a+b*b-c*c)/(2*a*b)) * (180/Math.PI) || 0;
+        }
+        function getKeypoint(kp, name) { return kp.find(k => k.name === name) || {x:0, y:0, score:0}; }
 
-        // --- Dragging Logic ---
+        // 修改单边文字反馈 (纯客观反映，不直接下定论，留给双侧比对)
+        function renderThresholdFeedback(testType, testSide, angleDeg) {
+            let tName = testType === 'slr'?'主动直腿抬高':(testType==='hip'?'主动髋屈曲':'主动肩屈');
+            let sName = testSide === 'L'?'左侧':'右侧';
+            let ability = testType === 'slr' ? '反映髋关节内旋能力' : (testType === 'hip' ? '反映髋关节外旋能力' : '反映骨盆前移程度');
+            
+            currentFeedbackText = `客观记录：${angleDeg.toFixed(1)}° (${ability})`;
+            thresholdFeedback.innerText = currentFeedbackText;
+            thresholdFeedback.className = `mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-[11px] sm:text-xs border-2 bg-indigo-500/20 border-indigo-500 text-indigo-300 z-10`;
+        }
+
+        // --- Workflow ---
+        btnRetake.addEventListener('click', () => {
+            resetCanvasForNewUpload();
+            if (lastCaptureMethod === 'live') btnStartCamera.click();
+            else { speak("请重新获取照片。"); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        });
+
+        function generateAndDownloadWatermark() {
+            const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
+            const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈'), sName = tSide === 'L'?'左侧':'右侧';
+            const now = new Date(), dateStr = now.getFullYear() + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getDate().toString().padStart(2, '0') + ' ' + now.toLocaleTimeString('zh-CN', {hour12: false});
+
+            const tCanvas = document.createElement('canvas'); tCanvas.width = canvas.width; tCanvas.height = canvas.height; const tCtx = tCanvas.getContext('2d'); tCtx.drawImage(canvas, 0, 0);
+            const barHeight = Math.max(100, tCanvas.height * 0.15); tCtx.fillStyle = 'rgba(15, 23, 42, 0.85)'; tCtx.fillRect(0, tCanvas.height - barHeight, tCanvas.width, barHeight);
+            
+            tCtx.fillStyle = '#ffffff'; tCtx.font = `bold ${Math.max(22, tCanvas.height * 0.035)}px sans-serif`; tCtx.textAlign = 'left'; tCtx.textBaseline = 'middle'; 
+            tCtx.fillText(`${sName}${tName}：${currentFinalAngle.toFixed(1)}°`, 20, tCanvas.height - barHeight + 35);
+            tCtx.fillStyle = '#818cf8'; tCtx.font = `bold ${Math.max(15, tCanvas.height * 0.022)}px sans-serif`; tCtx.fillText(currentFeedbackText, 20, tCanvas.height - barHeight + 70);
+            
+            tCtx.textAlign = 'right'; tCtx.fillStyle = 'rgba(203, 213, 225, 0.9)'; tCtx.font = `bold ${Math.max(14, tCanvas.height * 0.022)}px sans-serif`; tCtx.fillText(dateStr, tCanvas.width - 20, tCanvas.height - barHeight + 35);
+            tCtx.fillStyle = 'rgba(100, 116, 139, 0.7)'; tCtx.font = `italic bold ${Math.max(16, tCanvas.height * 0.025)}px sans-serif`; tCtx.fillText("@宋教头 | PelvicScan Pro", tCanvas.width - 20, tCanvas.height - barHeight + 70);
+
+            const link = document.createElement('a'); link.download = `${sName}${tName}_${now.getTime()}.jpg`; link.href = tCanvas.toDataURL('image/jpeg', 0.95); link.click();
+        }
+        btnDownload.addEventListener('click', generateAndDownloadWatermark);
+
+        btnSaveScore.addEventListener('click', () => {
+            generateAndDownloadWatermark();
+            const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
+            testRecords[tType][tSide] = currentFinalAngle;
+            document.getElementById(`score-${tType}-${tSide}`).innerText = currentFinalAngle.toFixed(0) + '°';
+            resetCanvasForNewUpload();
+
+            saveHistoryToStorage({
+                type: 'single', date: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                name: `${tSide === 'L'?'左侧':'右侧'}${tType === 'slr'?'直抬腿':(tType==='hip'?'髋屈曲':'肩屈')}`,
+                angle: currentFinalAngle.toFixed(1)
+            });
+
+            // 只要左右两边都有值，这个动作就完成
+            if (testRecords[tType].L !== null && testRecords[tType].R !== null) {
+                const trBox = document.getElementById(`tracker-${tType}`), fText = document.getElementById(`score-${tType}-final`);
+                trBox.classList.replace('bg-white', 'bg-emerald-50'); trBox.classList.replace('border-slate-100', 'border-emerald-500'); trBox.querySelector('span:first-child').classList.replace('text-slate-400', 'text-emerald-600');
+                fText.classList.replace('text-slate-300', 'text-emerald-600'); fText.innerText = "已完成";
+
+                if (tType === 'slr' && testRecords.hip.L === null) {
+                    document.querySelector('input[value="hip"]').checked = true; document.querySelector('input[value="L"]').checked = true;
+                    speak(`直抬腿完成。请准备左侧主动髋屈曲。`);
+                } else if (tType === 'hip' && testRecords.shoulder.L === null) {
+                    document.querySelector('input[value="shoulder"]').checked = true; document.querySelector('input[value="L"]').checked = true;
+                    speak(`髋屈曲完成。请准备左侧主动肩屈。`);
+                }
+            } else {
+                const nextSide = tSide === 'L' ? 'R' : 'L';
+                document.querySelector(`input[name="testSide"][value="${nextSide}"]`).checked = true;
+            }
+
+            if (testRecords.slr.L !== null && testRecords.slr.R !== null && testRecords.hip.L !== null && testRecords.hip.R !== null && testRecords.shoulder.L !== null && testRecords.shoulder.R !== null) {
+                generateFinalReport();
+            } else window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- 【核心重构】：基于 Conor Harris 的左右对比旋转识别 ---
+        function generateFinalReport() {
+            speak("评估全部完成！骨盆旋转与代偿报告已生成。");
+            const slrL = testRecords.slr.L, slrR = testRecords.slr.R;
+            const hipL = testRecords.hip.L, hipR = testRecords.hip.R;
+            const shL = testRecords.shoulder.L, shR = testRecords.shoulder.R;
+
+            // 差值计算 (大于5度视为显著差异，否则视为对称)
+            const diffHip = hipL - hipR; // 正 = 左侧外旋更好
+            const diffSLR = slrL - slrR; // 负 = 右侧内旋更好
+            const diffSh = shL - shR;    // 负 = 左侧更靠前(前移度大)
+
+            const threshold = 5;
+            let diagnosis = "Transition";
+            let title = "诊断: 过渡/混合骨盆代偿", desc = "", planHTML = "";
+
+            // 逻辑 1: 基线 (Left AIC) -> Hip: L>R, SLR: L<R, Sh: L<R
+            if (diffHip > threshold && diffSLR < -threshold && diffSh < -threshold) diagnosis = "LeftAIC";
+            // 逻辑 2: 横向 (Lateral) -> Hip: L>R, SLR: L<R, Sh: L>R
+            else if (diffHip > threshold && diffSLR < -threshold && diffSh > threshold) diagnosis = "Lateral";
+            // 逻辑 3: 斜轴 (Oblique Axis) -> Hip: L<R, SLR: L>R, Sh: L<R
+            else if (diffHip < -threshold && diffSLR > threshold && diffSh < -threshold) diagnosis = "Oblique";
+            // 逻辑 4: 无明显侧倾 (对称受限/双侧前倾)
+            else if (Math.abs(diffHip) <= 8 && Math.abs(diffSLR) <= 8 && Math.abs(diffSh) <= 8) diagnosis = "Anterior";
+            // 模糊匹配兜底
+            else {
+                let scoreLeftAIC = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh < 0 ? 1 : 0);
+                let scoreLateral = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh > 0 ? 1 : 0);
+                let scoreOblique = (diffHip < 0 ? 1 : 0) + (diffSLR > 0 ? 1 : 0) + (diffSh < 0 ? 1 : 0);
+                if (scoreLeftAIC >= 2 && scoreLeftAIC >= scoreLateral && scoreLeftAIC >= scoreOblique) diagnosis = "LeftAIC";
+                else if (scoreLateral >= 2 && scoreLateral >= scoreOblique) diagnosis = "Lateral";
+                else diagnosis = "Oblique";
+            }
+
+            const titleEl = document.getElementById('final-result-title');
+            const descEl = document.getElementById('final-result-desc');
+            const listEl = document.getElementById('final-exercise-list');
+
+            if (diagnosis === "LeftAIC") {
+                titleEl.innerText = "诊断: 基线偏位 (Left AIC)"; titleEl.className = "text-xl sm:text-2xl font-black text-indigo-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                descEl.innerText = "骨盆整体向右定向。左侧骨盆比右侧更前倾，导致左侧拥有更多外旋，右侧拥有更多内旋。这是人体不对称的初始基线代偿。";
+                listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">1.</span> PRI 90/90 支持左脚在墙上的交替交叉 (只做左脚在墙)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">2.</span> PRI 左膝向膝牵拉 (只做一边)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-indigo-500">3.</span> PRI 右侧向右心尖扩张,左臂伸展和左内收肌 (只做一边)</li>`;
+            } else if (diagnosis === "Lateral") {
+                titleEl.innerText = "诊断: 横向侧倾 (Lateral Tilt)"; titleEl.className = "text-xl sm:text-2xl font-black text-blue-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                descEl.innerText = "左臀部明显高于右侧，骨盆仿佛从左侧被整体向上推挤。左侧保留较多外旋，但右侧内旋功能被左侧的升高'固定'而限制。";
+                listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">1.</span> PRI 右侧向左内收肌拉回 (只做右侧躺)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">2.</span> PRI 交替循环步态</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-blue-500">3.</span> PRI 左侧躺着右侧 FA 外展 (只左侧躺)</li>`;
+            } else if (diagnosis === "Oblique") {
+                titleEl.innerText = "诊断: 斜轴倾斜 (Oblique Axis)"; titleEl.className = "text-xl sm:text-2xl font-black text-rose-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                descEl.innerText = "最深度的代偿：左侧骨盆极度靠前且偏高，骨盆沿对角线斜轴定向。左侧因太靠前而丧失外旋能力，可能伴随胸椎代偿。";
+                listEl.innerHTML = `<li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">1.</span> 左侧靠右推进 (单侧)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">2.</span> 左侧卧时右侧臀大肌促进 (单侧)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">3.</span> PRI 右侧向左内收肌拉回 (单侧)</li>
+                                    <li class="flex items-start gap-1.5"><span class="font-bold text-rose-500">4.</span> 补偿偏差的仰卧交叉连接 (每侧5次呼吸)</li>`;
+            } else {
+                titleEl.innerText = "诊断: 无侧倾 (双侧受限)"; titleEl.className = "text-xl sm:text-2xl font-black text-teal-600 mb-2 sm:mb-3 tracking-wide z-10 text-left";
+                descEl.innerText = "左右差异不明显（小于10度）。请排查是否为双侧骨盆前倾导致的空间受限。建议延长阶段一基础训练的执行时间。";
+                listEl.innerHTML = `<li class="flex items-start gap-1.5 text-teal-600 font-bold">请继续保持阶段一的 5 项基础呼吸与释放训练，激活侧腹肌，避免过度努力。</li>`;
+            }
+
+            saveHistoryToStorage({
+                type: 'full', date: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                slrL: slrL.toFixed(1), slrR: slrR.toFixed(1), hipL: hipL.toFixed(1), hipR: hipR.toFixed(1), shL: shL.toFixed(1), shR: shR.toFixed(1),
+                result: titleEl.innerText
+            });
+
+            document.getElementById('final-report-section').classList.remove('hidden');
+            setTimeout(() => document.getElementById('final-report-section').scrollIntoView({ behavior: 'smooth', block: 'end' }), 300);
+        }
+
+        // Dragging & Interaction (unchanged)
         function getEventCoords(e) {
             const rect = canvas.getBoundingClientRect(), scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
             let cx = e.clientX, cy = e.clientY; if (e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
@@ -781,167 +826,7 @@
         function handlePointerUp() { if (draggingPointIndex !== -1) { draggingPointIndex = -1; renderCanvasAndResult(); } }
         canvas.addEventListener('mousedown', handlePointerDown); canvas.addEventListener('mousemove', handlePointerMove); window.addEventListener('mouseup', handlePointerUp);
         canvas.addEventListener('touchstart', handlePointerDown, {passive: false}); canvas.addEventListener('touchmove', handlePointerMove, {passive: false}); window.addEventListener('touchend', handlePointerUp); window.addEventListener('touchcancel', handlePointerUp);
-
-        // --- Math & Feedback ---
-        function getAngle(p1, p2, p3) {
-            const a = Math.sqrt(Math.pow(p2.x-p1.x,2)+Math.pow(p2.y-p1.y,2)), b = Math.sqrt(Math.pow(p2.x-p3.x,2)+Math.pow(p2.y-p3.y,2)), c = Math.sqrt(Math.pow(p3.x-p1.x,2)+Math.pow(p3.y-p1.y,2));
-            return Math.acos((a*a+b*b-c*c)/(2*a*b)) * (180/Math.PI) || 0;
-        }
-        function getKeypoint(kp, name) { return kp.find(k => k.name === name) || {x:0, y:0, score:0}; }
-
-        function renderThresholdFeedback(testType, testSide, angleDeg) {
-            let feedback = "", fbClass = "", tName = testType === 'slr'?'主动直腿抬高':(testType==='hip'?'主动髋屈曲':'主动肩屈'), sName = testSide === 'L'?'左侧':'右侧';
-            if (testType === 'slr') {
-                if (angleDeg <= 50) { feedback = `【${sName}${tName}】判定：≤ 50° (后侧紧张)`; fbClass = "bg-indigo-500/20 border-indigo-500 text-indigo-300"; } 
-                else { feedback = `【${sName}${tName}】判定：> 50° (前侧紧张)`; fbClass = "bg-teal-500/20 border-teal-500 text-teal-300"; }
-            } else if (testType === 'hip') {
-                if (angleDeg >= 100) { feedback = `【${sName}${tName}】判定：≥ 100° (后侧紧张)`; fbClass = "bg-indigo-500/20 border-indigo-500 text-indigo-300"; } 
-                else { feedback = `【${sName}${tName}】判定：< 100° (前侧紧张)`; fbClass = "bg-teal-500/20 border-teal-500 text-teal-300"; }
-            } else {
-                if (angleDeg <= 100) { feedback = `【${sName}${tName}】判定：≤ 100° (后侧紧张)`; fbClass = "bg-indigo-500/20 border-indigo-500 text-indigo-300"; } 
-                else { feedback = `【${sName}${tName}】判定：> 100° (前侧紧张)`; fbClass = "bg-teal-500/20 border-teal-500 text-teal-300"; }
-            }
-            currentFeedbackText = feedback; thresholdFeedback.innerText = feedback; thresholdFeedback.className = `mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-xs sm:text-sm border-2 ${fbClass} z-10`;
-        }
-
-        // --- Workflow & Report ---
-        function updateLegend(testType) {
-            const legend = document.getElementById('point-legend');
-            if (testType === 'slr') legend.innerHTML = `<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span> 🔴 床面抗倾斜基准</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span> 🟡 臀部物理转轴</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> 🔵 抬起腿脚踝</div>`;
-            else if (testType === 'hip') legend.innerHTML = `<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span> 🔴 床面抗倾斜基准</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span> 🟡 臀部物理转轴</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> 🔵 抬起腿膝盖</div>`;
-            else legend.innerHTML = `<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span> 🔴 躯干平躺基准线</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span> 🟡 肩背物理转轴</div><div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> 🔵 举起手肘部</div>`;
-        }
-
-        // 【核心升级】：生成带时间戳、角度的专业水印照片并下载
-        function generateAndDownloadWatermark() {
-            const tType = document.querySelector('input[name="testType"]:checked').value;
-            const tSide = document.querySelector('input[name="testSide"]:checked').value;
-            const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈');
-            const sName = tSide === 'L'?'左侧':'右侧';
-            
-            const now = new Date();
-            // 获取精准的年月日时分秒
-            const dateStr = now.getFullYear() + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getDate().toString().padStart(2, '0') + ' ' + now.toLocaleTimeString('zh-CN', {hour12: false});
-
-            const tCanvas = document.createElement('canvas'); 
-            tCanvas.width = canvas.width; tCanvas.height = canvas.height; 
-            const tCtx = tCanvas.getContext('2d'); 
-            tCtx.drawImage(canvas, 0, 0);
-            
-            // 增加底部高度以容纳两行专业信息
-            const barHeight = Math.max(100, tCanvas.height * 0.15); 
-            tCtx.fillStyle = 'rgba(15, 23, 42, 0.85)'; 
-            tCtx.fillRect(0, tCanvas.height - barHeight, tCanvas.width, barHeight);
-            
-            // 绘制左侧：项目与角度、判定结果
-            tCtx.fillStyle = '#ffffff'; 
-            tCtx.font = `bold ${Math.max(22, tCanvas.height * 0.035)}px sans-serif`; 
-            tCtx.textAlign = 'left'; tCtx.textBaseline = 'middle'; 
-            tCtx.fillText(`${sName}${tName}：${currentFinalAngle.toFixed(1)}°`, 20, tCanvas.height - barHeight + 35);
-            
-            tCtx.fillStyle = currentFeedbackText.includes('后侧') ? '#a5b4fc' : '#5eead4'; // 根据前后侧改变结果颜色
-            tCtx.font = `bold ${Math.max(16, tCanvas.height * 0.025)}px sans-serif`; 
-            tCtx.fillText(currentFeedbackText, 20, tCanvas.height - barHeight + 70);
-            
-            // 绘制右侧：日期时间戳、专属水印
-            tCtx.textAlign = 'right';
-            tCtx.fillStyle = 'rgba(203, 213, 225, 0.9)'; 
-            tCtx.font = `bold ${Math.max(14, tCanvas.height * 0.022)}px sans-serif`;
-            tCtx.fillText(dateStr, tCanvas.width - 20, tCanvas.height - barHeight + 35);
-            
-            tCtx.fillStyle = 'rgba(100, 116, 139, 0.7)'; 
-            tCtx.font = `italic bold ${Math.max(16, tCanvas.height * 0.025)}px sans-serif`; 
-            tCtx.fillText("@宋教头 | PelvicScan Pro", tCanvas.width - 20, tCanvas.height - barHeight + 70);
-
-            // 触发下载
-            const link = document.createElement('a'); 
-            link.download = `${sName}${tName}_${now.getTime()}.jpg`; 
-            link.href = tCanvas.toDataURL('image/jpeg', 0.95); 
-            link.click();
-        }
-
-        // 绑定手动下载按钮
-        btnDownload.addEventListener('click', generateAndDownloadWatermark);
-
-        // 【新增】重新拍摄/检测逻辑
-        btnRetake.addEventListener('click', () => {
-            resetCanvasForNewUpload();
-            if (lastCaptureMethod === 'live') {
-                btnStartCamera.click();
-            } else {
-                speak("请重新获取照片。");
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        });
-
-        btnSaveScore.addEventListener('click', () => {
-            // 【闭环杀手锏】：点击录入成绩的瞬间，自动保存水印相片！
-            generateAndDownloadWatermark();
-
-            const tType = document.querySelector('input[name="testType"]:checked').value;
-            const tSide = document.querySelector('input[name="testSide"]:checked').value;
-            testRecords[tType][tSide] = currentFinalAngle;
-            document.getElementById(`score-${tType}-${tSide}`).innerText = currentFinalAngle.toFixed(0) + '°';
-            resetCanvasForNewUpload();
-
-            // 【闭环杀手锏】：将这次单侧成绩也直接打卡进历史档案！
-            const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈');
-            const sName = tSide === 'L'?'左侧':'右侧';
-            const dateStr = new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            
-            saveHistoryToStorage({
-                type: 'single',
-                date: dateStr,
-                name: `${sName}${tName}`,
-                angle: currentFinalAngle.toFixed(1),
-                result: currentFeedbackText.split('判定：')[1] || currentFeedbackText
-            });
-
-            if (testRecords[tType].L !== null && testRecords[tType].R !== null) {
-                const finalScore = Math.min(testRecords[tType].L, testRecords[tType].R);
-                testRecords[tType].final = finalScore;
-
-                const trBox = document.getElementById(`tracker-${tType}`), fText = document.getElementById(`score-${tType}-final`);
-                trBox.classList.replace('bg-white', 'bg-emerald-50'); trBox.classList.replace('border-slate-100', 'border-emerald-500'); trBox.querySelector('span:first-child').classList.replace('text-slate-400', 'text-emerald-600');
-                fText.classList.replace('text-slate-300', 'text-emerald-600'); fText.innerText = `最差: ${finalScore.toFixed(1)}°`;
-
-                if (tType === 'slr' && testRecords.hip.final === null) {
-                    document.querySelector('input[value="hip"]').checked = true; document.querySelector('input[value="L"]').checked = true;
-                    speak(`已提取主动直腿抬高最差侧分数。接下来请平躺，准备测试左侧主动髋屈曲。`);
-                } else if (tType === 'hip' && testRecords.shoulder.final === null) {
-                    document.querySelector('input[value="shoulder"]').checked = true; document.querySelector('input[value="L"]').checked = true;
-                    speak(`已提取主动髋屈曲最差侧分数。接下来请平躺，准备测试左侧主动肩屈。`);
-                }
-            } else {
-                const nextSide = tSide === 'L' ? 'R' : 'L';
-                document.querySelector(`input[name="testSide"][value="${nextSide}"]`).checked = true;
-            }
-
-            if (testRecords.slr.final !== null && testRecords.hip.final !== null && testRecords.shoulder.final !== null) generateFinalReport();
-            else window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        function generateFinalReport() {
-            speak("评估全部完成！您的专属诊断报告已生成，请查看。");
-            let pScore = 0;
-            if (testRecords.slr.final <= 50) pScore++; if (testRecords.hip.final >= 100) pScore++; if (testRecords.shoulder.final <= 100) pScore++;
-
-            const isPosterior = pScore >= 2, finalTitle = document.getElementById('final-result-title'), finalDesc = document.getElementById('final-result-desc'), finalList = document.getElementById('final-exercise-list');
-            if (isPosterior) {
-                finalTitle.innerText = "诊断: 后侧紧张模式"; finalTitle.className = "text-2xl sm:text-3xl font-black text-indigo-600 mb-2 sm:mb-3 tracking-wide z-10 text-center";
-                finalDesc.innerText = "骨盆后部肌肉组织存在压迫，使骨盆产生“向前推”的代偿。建议遵循方案 A 的恢复计划。";
-                finalList.innerHTML = `<li class="flex gap-2"><span class="font-bold text-indigo-400">1.</span> 钩卧腘绳肌臀桥 (恢复屈伸)</li><li class="flex gap-2"><span class="font-bold text-indigo-400">2.</span> 门框背阔肌拉伸 (推动骨盆后倾)</li><li class="flex gap-2"><span class="font-bold text-indigo-400">3.</span> 墙支撑伸展 (重新训练呼吸)</li>`;
-            } else {
-                finalTitle.innerText = "诊断: 前侧紧张模式"; finalTitle.className = "text-2xl sm:text-3xl font-black text-teal-600 mb-2 sm:mb-3 tracking-wide z-10 text-center";
-                finalDesc.innerText = "骨盆前侧肌肉组织存在压迫，将骨盆产生“向前拉”的代偿。建议遵循方案 B 的恢复计划。";
-                finalList.innerHTML = `<li class="flex gap-2"><span class="font-bold text-teal-500">1.</span> 90/90 侧支撑伸手 (侧腹肌呼吸)</li><li class="flex gap-2"><span class="font-bold text-teal-500">2.</span> 钩卧腘绳肌臀桥 (恢复屈曲)</li><li class="flex gap-2"><span class="font-bold text-teal-500">3.</span> 仰卧交叉交替 (伸展臀部)</li>`;
-            }
-            
-            // 最终综合报告存入档案
-            saveHistoryToStorage({ type: 'full', date: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }), slr: testRecords.slr.final.toFixed(1), hip: testRecords.hip.final.toFixed(1), shoulder: testRecords.shoulder.final.toFixed(1), result: isPosterior ? "方案 A (后侧)" : "方案 B (前侧)" });
-            document.getElementById('final-report-section').classList.remove('hidden'); setTimeout(() => document.getElementById('final-report-section').scrollIntoView({ behavior: 'smooth', block: 'end' }), 300);
-        }
-
+        btnReset.addEventListener('click', () => { if (originalAiPoints.length === 3) { activePoints = originalAiPoints.map(p => ({...p})); renderCanvasAndResult(); }});
     </script>
 </body>
 </html>
