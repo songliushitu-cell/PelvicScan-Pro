@@ -95,7 +95,7 @@
 
             <!-- 选择区域 -->
             <div class="flex flex-col gap-2">
-                <label class="block text-xs sm:text-sm font-bold text-slate-700">1. 选择动作 (需完成左右双侧)：</label>
+                <label class="block text-xs sm:text-sm font-bold text-slate-700">1. 选择动作 (必须完成全部6个槽位)：</label>
                 <div class="grid grid-cols-3 gap-2">
                     <label class="cursor-pointer">
                         <input type="radio" name="testType" value="slr" class="peer hidden" checked>
@@ -190,10 +190,10 @@
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         重拍
                     </button>
-                    <!-- 【核心引导升级】：按钮动态文字引导，防呆设计 -->
+                    <!-- 按钮动态文字引导，防呆设计 -->
                     <button id="save-score-btn" class="flex-[2] py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/30 transition-transform active:scale-[0.98] flex items-center justify-center gap-1.5 text-sm sm:text-base">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span id="btn-save-text">录入并继续</span>
+                        <span id="btn-save-text">录入左侧，准备测右侧</span>
                     </button>
                 </div>
                 
@@ -222,7 +222,11 @@
                     <span id="final-pelvic-orientation" class="text-xs sm:text-sm font-medium text-slate-700 leading-relaxed">--</span>
                 </div>
 
-                <div class="w-full flex flex-col gap-4 z-10">
+                <!-- 修复丢失的诊断描述标签 -->
+                <p id="final-result-desc" class="text-slate-600 text-left text-[11px] sm:text-xs leading-relaxed mb-4 sm:mb-6 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-indigo-50 shadow-sm z-10">--</p>
+
+                <!-- 【暂时隐藏训练计划区】增加 hidden 属性将其隐藏 -->
+                <div class="w-full flex flex-col gap-4 z-10 hidden">
                     <!-- 阶段一：通用基础 -->
                     <div>
                         <h3 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1">
@@ -307,7 +311,7 @@
         const btnReset = document.getElementById('reset-btn');
         const btnDownload = document.getElementById('download-btn');
         const btnSaveScore = document.getElementById('save-score-btn');
-        const btnSaveText = document.getElementById('btn-save-text'); // 新增按钮文字指引
+        const btnSaveText = document.getElementById('btn-save-text'); 
         const btnRetake = document.getElementById('retake-btn');
         const currentBoardTitle = document.getElementById('current-board-title');
 
@@ -328,7 +332,6 @@
         let activePoints = []; 
         let originalAiPoints = []; 
         let draggingPointIndex = -1;
-        let dotHitRadius = 35; 
         let currentFinalAngle = 0; 
         let currentFeedbackText = ""; 
         let lastCaptureMethod = null; 
@@ -353,6 +356,12 @@
             staticImageBuffer.height = canvas.height;
             staticImageBuffer.getContext('2d').drawImage(videoElement, 0, 0);
             liveMaxPoints = activePoints.map(p => ({...p}));
+        }
+
+        // 监听按钮切换，动态更新提示文字
+        function updateSaveButtonText() {
+            const side = document.querySelector('input[name="testSide"]:checked').value;
+            btnSaveText.innerText = side === 'L' ? '录入左侧，准备测右侧' : '录入右侧，进入下一项';
         }
 
         // 图例更新函数
@@ -454,8 +463,9 @@
             stopLiveTracking(); 
             canvasContainer.classList.add('hidden'); dragInstruction.classList.add('hidden'); resultBoard.classList.add('hidden'); currentPoses = [];
         }
-        radioInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
-        sideInputs.forEach(r => r.addEventListener('change', resetCanvasForNewUpload));
+        
+        radioInputs.forEach(r => r.addEventListener('change', () => { resetCanvasForNewUpload(); updateSaveButtonText(); }));
+        sideInputs.forEach(r => r.addEventListener('change', () => { resetCanvasForNewUpload(); updateSaveButtonText(); }));
 
         // --- 4. Live Tracking (Strict Isometric Hold Algorithm 1.5s) ---
         btnStartCamera.addEventListener('click', async () => {
@@ -692,7 +702,7 @@
                 displayAngle.innerText = Math.max(0, currentFinalAngle).toFixed(1) + '°';
                 currentBoardTitle.innerText = `当前测量: ${tSide === 'L' ? '左侧' : '右侧'}`;
                 
-                // 【核心引导】：动态改变按钮文字，提醒用户必须要测左右双侧！
+                // 按钮动态文字引导
                 btnSaveText.innerText = tSide === 'L' ? '录入左侧，准备测右侧' : '录入右侧，进入下一项';
                 
                 renderThresholdFeedback(tType, tSide, currentFinalAngle);
@@ -712,14 +722,51 @@
             thresholdFeedback.className = `mt-2 w-full py-2 px-3 rounded-lg text-center font-bold text-[11px] sm:text-xs border-2 bg-indigo-500/20 border-indigo-500 text-indigo-300 z-10`;
         }
 
-        // --- Workflow ---
+        // --- Dragging & Interaction (彻底修复手机触摸拖拽Bug) ---
+        function getEventCoords(e) {
+            const rect = canvas.getBoundingClientRect(), scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+            let cx = 0, cy = 0; 
+            // 兼容手机 Touch 事件 和 电脑 Mouse 事件
+            if (e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+            else { cx = e.clientX; cy = e.clientY; }
+            return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
+        }
+
+        function handlePointerDown(e) {
+            if (activePoints.length !== 3 || isLiveTracking) return;
+            const {x, y} = getEventCoords(e);
+            
+            // 【极其关键】：把触摸感应区映射为固定的物理屏幕尺寸，确保手机上绝对能点到（至少50个物理像素宽）
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const touchTargetCanvasRadius = Math.max(50 * scaleX, canvas.width * 0.08); 
+
+            draggingPointIndex = activePoints.findIndex(p => Math.sqrt(Math.pow(p.x-x,2)+Math.pow(p.y-y,2)) <= touchTargetCanvasRadius);
+            if (draggingPointIndex !== -1) { e.preventDefault(); renderCanvasAndResult(staticImageBuffer); }
+        }
+
+        function handlePointerMove(e) {
+            if (draggingPointIndex === -1 || isLiveTracking) return;
+            e.preventDefault(); const {x, y} = getEventCoords(e);
+            activePoints[draggingPointIndex].x = Math.max(0, Math.min(x, canvas.width)); activePoints[draggingPointIndex].y = Math.max(0, Math.min(y, canvas.height));
+            requestAnimationFrame(() => renderCanvasAndResult(staticImageBuffer));
+        }
+
+        function handlePointerUp() { if (draggingPointIndex !== -1) { draggingPointIndex = -1; renderCanvasAndResult(staticImageBuffer); } }
+        
+        canvas.addEventListener('mousedown', handlePointerDown); canvas.addEventListener('mousemove', handlePointerMove); window.addEventListener('mouseup', handlePointerUp);
+        canvas.addEventListener('touchstart', handlePointerDown, {passive: false}); canvas.addEventListener('touchmove', handlePointerMove, {passive: false}); window.addEventListener('touchend', handlePointerUp); window.addEventListener('touchcancel', handlePointerUp);
+        
+        btnReset.addEventListener('click', () => { if (originalAiPoints.length === 3) { activePoints = originalAiPoints.map(p => ({...p})); renderCanvasAndResult(staticImageBuffer); }});
+
+        // --- Workflow 控制 ---
         btnRetake.addEventListener('click', () => {
             resetCanvasForNewUpload();
             if (lastCaptureMethod === 'live') btnStartCamera.click();
             else { speak("请重新获取照片。"); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
 
-        // 经典的 a 标签安全下载 (不唤起原生菜单以免冲突卡死)
+        // 经典的 a 标签安全下载 (放进异步线程，绝不卡死主程序)
         function generateAndDownloadWatermark() {
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈'), sName = tSide === 'L'?'左侧':'右侧';
@@ -743,60 +790,75 @@
 
         btnDownload.addEventListener('click', generateAndDownloadWatermark);
 
+        // 获取下一个未测试的动作 (防漏测引流引擎)
+        function getNextMissingTest() {
+            if (testRecords.slr.L === null) return {type: 'slr', side: 'L'};
+            if (testRecords.slr.R === null) return {type: 'slr', side: 'R'};
+            if (testRecords.hip.L === null) return {type: 'hip', side: 'L'};
+            if (testRecords.hip.R === null) return {type: 'hip', side: 'R'};
+            if (testRecords.shoulder.L === null) return {type: 'shoulder', side: 'L'};
+            if (testRecords.shoulder.R === null) return {type: 'shoulder', side: 'R'};
+            return null; // 全部测完
+        }
+
+        // 更新顶部成绩面板
+        function updateTrackerUI() {
+            ['slr', 'hip', 'shoulder'].forEach(t => {
+                const trBox = document.getElementById(`tracker-${t}`);
+                const fText = document.getElementById(`score-${t}-final`);
+                const valL = testRecords[t].L;
+                const valR = testRecords[t].R;
+                
+                if (valL !== null) document.getElementById(`score-${t}-L`).innerText = valL.toFixed(0) + '°';
+                if (valR !== null) document.getElementById(`score-${t}-R`).innerText = valR.toFixed(0) + '°';
+                
+                if (valL !== null && valR !== null) {
+                    testRecords[t].final = Math.min(valL, valR);
+                    trBox.classList.replace('bg-white', 'bg-emerald-50'); 
+                    trBox.classList.replace('border-slate-100', 'border-emerald-500'); 
+                    trBox.querySelector('span:first-child').classList.replace('text-slate-400', 'text-emerald-600');
+                    fText.classList.replace('text-slate-300', 'text-emerald-600'); 
+                    fText.innerText = `较差: ${testRecords[t].final.toFixed(1)}°`;
+                }
+            });
+        }
+
         btnSaveScore.addEventListener('click', () => {
-            // 【闭环杀手锏】：将其扔进异步线程，绝不让手机下载框卡死UI流转
-            setTimeout(() => {
-                try { generateAndDownloadWatermark(); } catch(e) { console.error("Watermark Err", e); }
-            }, 300);
+            // 异步处理下载，绝不卡死界面
+            setTimeout(() => { try { generateAndDownloadWatermark(); } catch(e) { console.error(e); } }, 100);
 
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             testRecords[tType][tSide] = currentFinalAngle;
-            document.getElementById(`score-${tType}-${tSide}`).innerText = currentFinalAngle.toFixed(0) + '°';
-            resetCanvasForNewUpload();
-
+            
             saveHistoryToStorage({
                 type: 'single', date: new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
                 name: `${tSide === 'L'?'左侧':'右侧'}${tType === 'slr'?'直抬腿':(tType==='hip'?'髋屈曲':'肩屈')}`,
                 angle: currentFinalAngle.toFixed(1)
             });
 
-            if (testRecords[tType].L !== null && testRecords[tType].R !== null) {
-                testRecords[tType].final = Math.min(testRecords[tType].L, testRecords[tType].R);
+            // 更新面板
+            updateTrackerUI();
+            resetCanvasForNewUpload();
 
-                const trBox = document.getElementById(`tracker-${tType}`);
-                const fText = document.getElementById(`score-${tType}-final`);
+            // 智能闭环引导：自动跳转到下一个没测过的槽位
+            const nextTest = getNextMissingTest();
+            if (nextTest) {
+                document.querySelector(`input[name="testType"][value="${nextTest.type}"]`).checked = true;
+                document.querySelector(`input[name="testSide"][value="${nextTest.side}"]`).checked = true;
                 
-                trBox.classList.replace('bg-white', 'bg-emerald-50'); 
-                trBox.classList.replace('border-slate-100', 'border-emerald-500'); 
-                trBox.querySelector('span:first-child').classList.replace('text-slate-400', 'text-emerald-600');
-                fText.classList.replace('text-slate-300', 'text-emerald-600'); 
-                fText.innerText = `较差: ${testRecords[tType].final.toFixed(1)}°`;
-
-                if (tType === 'slr' && testRecords.hip.L === null) {
-                    document.querySelector('input[value="hip"]').checked = true; document.querySelector('input[value="L"]').checked = true;
-                    speak(`直抬腿完成。请准备左侧主动髋屈曲。`);
-                } else if (tType === 'hip' && testRecords.shoulder.L === null) {
-                    document.querySelector('input[value="shoulder"]').checked = true; document.querySelector('input[value="L"]').checked = true;
-                    speak(`髋屈曲完成。请准备左侧主动肩屈。`);
-                }
-            } else {
-                const nextSide = tSide === 'L' ? 'R' : 'L';
-                document.querySelector(`input[name="testSide"][value="${nextSide}"]`).checked = true;
-            }
-
-            // 检查是否全部6个点都录入了
-            if (testRecords.slr.L !== null && testRecords.slr.R !== null && testRecords.hip.L !== null && testRecords.hip.R !== null && testRecords.shoulder.L !== null && testRecords.shoulder.R !== null) {
-                generateFinalReport();
-            } else {
-                // 防呆提醒：如果你手动跳过了某一侧，在此弹窗警告！
-                if (tType === 'shoulder' && tSide === 'R') {
-                    alert("检测到仍有单侧未完成！PRI 骨盆评估必须包含完整的左右对比数据，请查看顶部面板，补全漏测项目以生成报告。");
-                }
+                let tName = nextTest.type === 'slr'?'主动直腿抬高':(nextTest.type==='hip'?'主动髋屈曲':'主动肩屈');
+                let sName = nextTest.side === 'L'?'左侧':'右侧';
+                
+                updateSaveButtonText();
+                speak(`记录成功。接下来请准备，${sName}${tName}。`);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // 如果全部6个都测完了，直接出结果！
+                generateFinalReport();
             }
         });
 
-        // --- 基于 PRI 的最终双侧差值诊断算法 (含前后侧紧张判断与大白话描述) ---
+        // --- 基于 PRI 的最终双侧差值诊断算法 ---
         function generateFinalReport() {
             speak("评估全部完成！骨盆旋转与代偿报告已生成。");
             
