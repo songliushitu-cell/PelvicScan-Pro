@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PelvicScan Pro - AI 骨盆评估系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 TensorFlow.js 和 MoveNet 高精度姿态识别模型 -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@3.21.0/dist/tf-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@3.21.0/dist/tf-converter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@3.21.0/dist/tf-backend-webgl.min.js"></script>
@@ -196,7 +195,7 @@
                 </div>
                 
                 <button id="download-btn" class="mt-3 text-[10px] sm:text-xs text-slate-400 hover:text-white underline underline-offset-4 transition-colors z-10">
-                    仅保存当前带水印单项截图
+                    仅手动保存当前截图
                 </button>
             </div>
 
@@ -212,7 +211,7 @@
                 
                 <div id="final-result-title" class="text-xl sm:text-2xl font-black text-indigo-700 mb-2 sm:mb-3 tracking-wide z-10 text-center leading-tight">获取中...</div>
 
-                <!-- 新增：明确骨盆朝向面板 -->
+                <!-- 明确骨盆朝向面板 -->
                 <div class="w-full bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 flex items-start gap-2 mb-3 z-10 shadow-sm">
                     <span class="text-lg">🧭</span>
                     <div class="flex flex-col">
@@ -338,6 +337,9 @@
         let isLiveTracking = false;
         let liveStream = null;
         let liveRequestID = null;
+
+        // 【关键Bug修复】：添加进程锁，防止动态捕捉成功后静态图片onload幽灵刷新覆盖UI
+        let ignoreNextImageLoad = false;
 
         // Auto-Peak Detection (1.5s)
         let liveMaxAngle = 0;
@@ -498,8 +500,13 @@
         function triggerAutoLock() {
             if (!isLiveTracking) return;
             stopLiveTracking();
+            
+            // 【关键Bug修复】：上锁，告诉onload函数不要执行覆盖逻辑
+            ignoreNextImageLoad = true;
+            
             if (!liveMaxFrameDataURL) { saveFrameToBuffer(); liveMaxAngle = currentFinalAngle || 0; }
-            sourceImage.src = liveMaxFrameDataURL; activePoints = liveMaxPoints.map(p => ({...p})); originalAiPoints = activePoints.map(p => ({...p}));
+            sourceImage.src = liveMaxFrameDataURL; 
+            activePoints = liveMaxPoints.map(p => ({...p})); originalAiPoints = activePoints.map(p => ({...p}));
             
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             updateLegend(tType); dragInstruction.classList.remove('hidden'); resultBoard.classList.remove('hidden');
@@ -507,7 +514,7 @@
             currentFinalAngle = liveMaxAngle; renderCanvasAndResult(sourceImage); 
             setTimeout(() => resultBoard.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
             
-            // 语音修改为：拍摄完整，角度是多少度
+            // 【优化】：语音播报
             speak(`拍摄完整，角度是${liveMaxAngle.toFixed(1)}度。`);
         }
 
@@ -534,6 +541,12 @@
         }
 
         sourceImage.onload = function() {
+            // 【关键Bug修复】：拦截因动态捕捉存图而意外触发的onload
+            if (ignoreNextImageLoad) {
+                ignoreNextImageLoad = false;
+                return;
+            }
+            
             if(isLiveTracking) return; 
             canvasContainer.classList.remove('hidden'); analyzingMask.classList.remove('hidden'); ctx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
             setTimeout(async () => {
@@ -619,7 +632,6 @@
                                 document.getElementById('live-status-text').innerHTML = `<span class="text-rose-500 font-black tracking-widest text-sm shadow-sm px-2 py-1 bg-slate-900/50 rounded-full">🎯 保持住！ ${timeLeft}s 📸</span>`;
                             }
                         } else {
-                            // 角度掉落，智能降级寻找真实AROM
                             liveMaxAngle = smoothedAngle; isHolding = false; holdStartTime = 0;
                             document.getElementById('live-status-text').innerHTML = `<span class="text-amber-400 font-bold text-xs tracking-wider">角度回落，正在重新锚定...</span>`;
                         }
@@ -671,7 +683,7 @@
         }
         function getKeypoint(kp, name) { return kp.find(k => k.name === name) || {x:0, y:0, score:0}; }
 
-        // 修改单边文字反馈
+        // 【优化】：移除单边评测中不准确的“前侧/后侧紧张”诱导，保持纯客观记录，避免与最终报告冲突
         function renderThresholdFeedback(testType, testSide, angleDeg) {
             let ability = testType === 'slr' ? '反映髋关节内旋能力' : (testType === 'hip' ? '反映髋关节外旋能力' : '反映骨盆前移程度');
             currentFeedbackText = `客观记录：${angleDeg.toFixed(1)}° (${ability})`;
@@ -686,8 +698,8 @@
             else { speak("请重新获取照片。"); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         });
 
-        // 【核心升级】：调用原生分享API无缝存入 iPhone 相册
-        function generateAndDownloadWatermark() {
+        // 【核心升级：iOS相册原生调用功能】
+        function generateWatermarkFile() {
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             const tName = tType === 'slr'?'主动直腿抬高':(tType==='hip'?'主动髋屈曲':'主动肩屈'), sName = tSide === 'L'?'左侧':'右侧';
             const now = new Date(), dateStr = now.getFullYear() + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getDate().toString().padStart(2, '0') + ' ' + now.toLocaleTimeString('zh-CN', {hour12: false});
@@ -702,37 +714,41 @@
             tCtx.textAlign = 'right'; tCtx.fillStyle = 'rgba(203, 213, 225, 0.9)'; tCtx.font = `bold ${Math.max(14, tCanvas.height * 0.022)}px sans-serif`; tCtx.fillText(dateStr, tCanvas.width - 20, tCanvas.height - barHeight + 35);
             tCtx.fillStyle = 'rgba(100, 116, 139, 0.7)'; tCtx.font = `italic bold ${Math.max(16, tCanvas.height * 0.025)}px sans-serif`; tCtx.fillText("@宋教头 | PelvicScan Pro", tCanvas.width - 20, tCanvas.height - barHeight + 70);
 
-            // 转为 Blob 并调用 iPhone 原生分享菜单
-            tCanvas.toBlob(async (blob) => {
-                const filename = `${sName}${tName}_${now.getTime()}.jpg`;
-                const file = new File([blob], filename, { type: 'image/jpeg' });
-                
-                // 判断是否支持 Web Share API (Safari 完美支持)
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: '评估图存入相册',
-                        });
-                        // 用户在原生菜单点“保存图像”后直接存入照片APP
-                        return; 
-                    } catch (err) {
-                        console.log('用户取消分享或分享失败', err);
-                    }
-                } else {
-                    // 如果不支持或在PC端，降级为普通下载 (保存到“文件”APP)
-                    const link = document.createElement('a'); 
-                    link.download = filename; 
-                    link.href = URL.createObjectURL(blob); 
-                    link.click();
-                }
-            }, 'image/jpeg', 0.95);
+            // 【关键黑科技】：同步生成原生 File 对象，防止丢失浏览器 User-Gesture 权限
+            const dataUrl = tCanvas.toDataURL('image/jpeg', 0.95);
+            const arr = dataUrl.split(','), mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+            
+            return new File([u8arr], `${sName}${tName}_${now.getTime()}.jpg`, {type:mime});
         }
 
-        btnDownload.addEventListener('click', generateAndDownloadWatermark);
+        // 调用原生分享菜单（iOS专用）或备用下载方案
+        function handleSaveAndShare() {
+            const file = generateWatermarkFile();
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                // 呼出 iPhone 底部菜单，用户点击“保存图像”即入相册，这是iOS沙盒权限下的完美妥协方案
+                navigator.share({
+                    files: [file],
+                    title: '保存评估图'
+                }).catch(err => { console.log('分享被取消或失败:', err); });
+            } else {
+                // 降级方案 (PC 或 老式安卓)
+                const link = document.createElement('a'); 
+                link.download = file.name; 
+                link.href = URL.createObjectURL(file); 
+                link.click();
+            }
+        }
+
+        btnDownload.addEventListener('click', handleSaveAndShare);
 
         btnSaveScore.addEventListener('click', () => {
-            generateAndDownloadWatermark();
+            // 点击“录入并继续”时，先呼出分享存图菜单
+            handleSaveAndShare();
+
             const tType = document.querySelector('input[name="testType"]:checked').value, tSide = document.querySelector('input[name="testSide"]:checked').value;
             testRecords[tType][tSide] = currentFinalAngle;
             document.getElementById(`score-${tType}-${tSide}`).innerText = currentFinalAngle.toFixed(0) + '°';
@@ -766,44 +782,43 @@
             } else window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // --- 【核心重构】：基于 Conor Harris 的左右对比旋转识别 ---
+        // --- 基于 PRI 的最终双侧差值诊断算法 ---
         function generateFinalReport() {
             speak("评估全部完成！骨盆旋转与代偿报告已生成。");
             const slrL = testRecords.slr.L, slrR = testRecords.slr.R;
             const hipL = testRecords.hip.L, hipR = testRecords.hip.R;
             const shL = testRecords.shoulder.L, shR = testRecords.shoulder.R;
 
-            // 差值计算 (大于5度视为显著差异，否则视为对称)
-            const diffHip = hipL - hipR; // 正 = 左侧外旋更好
-            const diffSLR = slrL - slrR; // 负 = 右侧内旋更好
-            const diffSh = shL - shR;    // 负 = 左侧更靠前(前移度大)
+            // 差值计算
+            const diffHip = hipL - hipR; 
+            const diffSLR = slrL - slrR; 
+            const diffSh = shL - shR;    
 
             const threshold = 5;
             let diagnosis = "Transition";
             let title = "诊断: 过渡/混合骨盆代偿", desc = "", planHTML = "";
-            let orientationText = "骨盆朝向数据复杂，需人工介入分析"; // 新增：朝向变量
+            let orientationText = "骨盆朝向数据复杂，需人工介入分析";
 
-            // 逻辑 1: 基线 (Left AIC) -> Hip: L>R, SLR: L<R, Sh: L<R
+            // 逻辑 1: 基线 (Left AIC)
             if (diffHip > threshold && diffSLR < -threshold && diffSh < -threshold) {
                 diagnosis = "LeftAIC";
                 orientationText = "整体向右定向，左侧骨盆前倾";
             }
-            // 逻辑 2: 横向 (Lateral) -> Hip: L>R, SLR: L<R, Sh: L>R
+            // 逻辑 2: 横向 (Lateral)
             else if (diffHip > threshold && diffSLR < -threshold && diffSh > threshold) {
                 diagnosis = "Lateral";
                 orientationText = "左臀部明显被向上推高固定";
             }
-            // 逻辑 3: 斜轴 (Oblique Axis) -> Hip: L<R, SLR: L>R, Sh: L<R
+            // 逻辑 3: 斜轴 (Oblique Axis)
             else if (diffHip < -threshold && diffSLR > threshold && diffSh < -threshold) {
                 diagnosis = "Oblique";
                 orientationText = "左侧极度靠前，呈对角线旋转";
             }
-            // 逻辑 4: 无明显侧倾 (对称受限/双侧前倾)
+            // 逻辑 4: 无明显侧倾
             else if (Math.abs(diffHip) <= 8 && Math.abs(diffSLR) <= 8 && Math.abs(diffSh) <= 8) {
                 diagnosis = "Anterior";
                 orientationText = "骨盆整体前倾（双侧均匀受限）";
             }
-            // 模糊匹配兜底
             else {
                 let scoreLeftAIC = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh < 0 ? 1 : 0);
                 let scoreLateral = (diffHip > 0 ? 1 : 0) + (diffSLR < 0 ? 1 : 0) + (diffSh > 0 ? 1 : 0);
@@ -816,7 +831,7 @@
             const titleEl = document.getElementById('final-result-title');
             const descEl = document.getElementById('final-result-desc');
             const listEl = document.getElementById('final-exercise-list');
-            const orientationEl = document.getElementById('final-pelvic-orientation'); // 绑定朝向UI
+            const orientationEl = document.getElementById('final-pelvic-orientation'); 
             
             orientationEl.innerText = orientationText;
 
@@ -855,28 +870,6 @@
             setTimeout(() => document.getElementById('final-report-section').scrollIntoView({ behavior: 'smooth', block: 'end' }), 300);
         }
 
-        // Dragging & Interaction
-        function getEventCoords(e) {
-            const rect = canvas.getBoundingClientRect(), scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-            let cx = e.clientX, cy = e.clientY; if (e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
-            return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
-        }
-        function handlePointerDown(e) {
-            if (activePoints.length !== 3 || isLiveTracking) return;
-            const {x, y} = getEventCoords(e);
-            draggingPointIndex = activePoints.findIndex(p => Math.sqrt(Math.pow(p.x-x,2)+Math.pow(p.y-y,2)) <= Math.max(dotHitRadius, canvas.width*0.06));
-            if (draggingPointIndex !== -1) { e.preventDefault(); renderCanvasAndResult(); }
-        }
-        function handlePointerMove(e) {
-            if (draggingPointIndex === -1 || isLiveTracking) return;
-            e.preventDefault(); const {x, y} = getEventCoords(e);
-            activePoints[draggingPointIndex].x = Math.max(0, Math.min(x, canvas.width)); activePoints[draggingPointIndex].y = Math.max(0, Math.min(y, canvas.height));
-            requestAnimationFrame(() => renderCanvasAndResult());
-        }
-        function handlePointerUp() { if (draggingPointIndex !== -1) { draggingPointIndex = -1; renderCanvasAndResult(); } }
-        canvas.addEventListener('mousedown', handlePointerDown); canvas.addEventListener('mousemove', handlePointerMove); window.addEventListener('mouseup', handlePointerUp);
-        canvas.addEventListener('touchstart', handlePointerDown, {passive: false}); canvas.addEventListener('touchmove', handlePointerMove, {passive: false}); window.addEventListener('touchend', handlePointerUp); window.addEventListener('touchcancel', handlePointerUp);
-        btnReset.addEventListener('click', () => { if (originalAiPoints.length === 3) { activePoints = originalAiPoints.map(p => ({...p})); renderCanvasAndResult(); }});
     </script>
 </body>
 </html>
